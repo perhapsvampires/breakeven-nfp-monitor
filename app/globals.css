@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/*
+  Breakeven NFP Monitor design system.
+  Tailwind v4 reads the @theme block below to generate utility classes
+  (e.g. --color-accent -> bg-accent / text-accent / border-accent).
+*/
+@theme {
+  --color-background: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+  --color-primary: #0f172a;
+  --color-secondary: #64748b;
+  --color-tertiary: #94a3b8;
+  --color-accent: #1d4ed8;
+  --color-positive: #16a34a;
+  --color-negative: #dc2626;
+  --color-warning: #d97706;
+  --color-chart-bar: #93c5fd;
+  --color-chart-line: #1d4ed8;
+  --color-recession: rgba(100, 116, 139, 0.08);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-primary);
+  font-family: var(--font-sans);
+}
+
+/* All numeric data uses tabular figures so columns line up. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}

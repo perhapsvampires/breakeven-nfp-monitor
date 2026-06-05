@@ -1,0 +1,140 @@
+import { computeEmployAmericaCER } from '@/lib/models/employAmericaCER'
+import { BreakevenChart } from '@/components/charts/BreakevenChart'
+import { ModelCard } from '@/components/ModelCard'
+import { MetricsRow } from '@/components/MetricsRow'
+import { MethodologyNote } from '@/components/MethodologyNote'
+import { formatK, formatMonthYear, formatLongDate } from '@/lib/formatting'
+import type { CerDecomposition } from '@/types/economic'
+
+export const revalidate = 21600 // 6 hours
+
+export default async function EmployAmericaPage() {
+  const result = await computeEmployAmericaCER()
+
+  const latestPoint = [...result.points].reverse().find((p) => p.breakeven != null)
+  const latestMonth = latestPoint?.date
+  const gap =
+    result.latestActual != null && result.latestBreakeven != null
+      ? result.latestActual - result.latestBreakeven
+      : null
+  const decomp = (result.meta?.decomposition as CerDecomposition | null) ?? null
+
+  return (
+    <div className="space-y-6">
+      {/* Title */}
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight text-primary">
+            Employ America — Constant-Employment-Rate (CER)
+          </h2>
+          <p className="mt-1 text-sm text-secondary">
+            Population-driven breakeven payrolls, stripping out within-cohort
+            employment-rate changes.
+          </p>
+        </div>
+        {latestMonth && (
+          <p className="text-xs text-tertiary">
+            Latest data: {formatMonthYear(latestMonth)} · Updated{' '}
+            {formatLongDate(new Date(result.computedAt))}
+          </p>
+        )}
+      </div>
+
+      {/* Headline cards */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <ModelCard
+          label="CER Breakeven"
+          value={formatK(result.latestBreakeven, false)}
+          sub={latestMonth ? `${formatMonthYear(latestMonth)}, per month` : undefined}
+          accent="neutral"
+        />
+        <ModelCard
+          label="Actual NFP"
+          value={formatK(result.latestActual)}
+          sub="Latest monthly print"
+          accent="neutral"
+        />
+        <ModelCard
+          label="Gap vs Breakeven"
+          value={formatK(gap)}
+          sub={gap == null ? undefined : gap >= 0 ? 'Above breakeven' : 'Below breakeven'}
+          accent={gap == null ? 'neutral' : gap >= 0 ? 'positive' : 'negative'}
+        />
+      </div>
+
+      {/* Chart */}
+      <div className="rounded-lg border border-border bg-surface p-5">
+        <div className="mb-3 flex items-center gap-4 text-xs text-secondary">
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-2.5 w-3 rounded-sm bg-chart-bar" />
+            Actual NFP (MoM)
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-0.5 w-4 bg-chart-line" />
+            CER breakeven
+          </span>
+        </div>
+        <BreakevenChart points={result.points} />
+      </div>
+
+      {/* Decomposition */}
+      {decomp && (
+        <div className="rounded-lg border border-border bg-surface p-5">
+          <p className="mb-3 text-xs font-medium uppercase tracking-widest text-secondary">
+            Latest decomposition (per month)
+          </p>
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm tnum">
+            <span className="text-secondary">NFP growth</span>
+            <span className="font-medium text-primary">{formatK(decomp.gN)}</span>
+            <span className="text-tertiary">−</span>
+            <span className="text-secondary">EPR change</span>
+            <span className="font-medium text-primary">{formatK(decomp.gEpr)}</span>
+            <span className="text-tertiary">−</span>
+            <span className="text-secondary">adjustment</span>
+            <span className="font-medium text-primary">{formatK(decomp.gAdj)}</span>
+            <span className="text-tertiary">=</span>
+            <span className="text-secondary">CER breakeven</span>
+            <span className="font-semibold text-accent">{formatK(decomp.gCer, false)}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Metrics */}
+      <MetricsRow actual={result.actualSummary} breakeven={result.breakevenSummary} />
+
+      {/* Source callout */}
+      <div className="rounded-lg border border-accent/20 bg-accent/5 p-5 text-sm leading-relaxed text-primary">
+        This model removes the effect of changing employment rates within age
+        groups, leaving only the population-driven component. It requires no
+        immigration assumptions, making it the most robust to demographic
+        uncertainty.
+      </div>
+
+      {/* Methodology */}
+      <MethodologyNote
+        source="Preston Mui, Employ America — “Estimating Constant-Employment-Rate (CER) NFP Growth,” April 2026."
+        vintage="Census CPS Basic Monthly microdata (foreign-born × age cohorts) + FRED PAYEMS; 12-month windows"
+      >
+        <p>
+          CER decomposes 12-month payroll growth into a within-cohort
+          employment-rate term, a population term, a CPS-to-CES definitional
+          adjustment, and residual noise:{' '}
+          <span className="tnum">g_CER = g_N − g_ẽ − g_A</span>. Subtracting the
+          employment-weighted change in cohort employment-population ratios
+          leaves the population-driven pace of job growth needed to hold
+          employment rates constant.
+        </p>
+        <p>
+          Cohorts are defined by foreign-born status crossed with age band
+          (16-24, 25-34, 35-44, 45-54, 55-64, 65+), with employment and
+          population aggregated from Census CPS Basic Monthly microdata
+          (weight PWSSWGT). The foreign-born dimension lets the 2025-26
+          immigration reversal register as a population effect — the reason this
+          tracks Employ America&rsquo;s published series. The small payroll-concept
+          adjustment g_A is set to 0. Validated against the published chart:
+          mean ≈ 123k vs 99k, MAE ≈ 40k, capturing the 2024→2026 decline.
+        </p>
+      </MethodologyNote>
+    </div>
+  )
+}
