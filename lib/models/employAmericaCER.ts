@@ -43,8 +43,18 @@ interface CohortCell {
 }
 type CohortMonth = Record<string, CohortCell>
 
-const MONTHS = cohortData.months as Record<string, CohortMonth>
-const COHORT_IDS = (cohortData.cohorts as Array<{ id: string }>).map((c) => c.id)
+// Defensive: on Vercel the statically-imported JSON could be missing or empty
+// if it failed to bundle. Null-coalesce so MONTHS / COHORT_IDS are never
+// undefined (which would throw during prerender). Typed cast is used instead of
+// `as any` to satisfy the no-explicit-any lint rule.
+interface CohortDataShape {
+  months?: Record<string, CohortMonth>
+  cohorts?: Array<{ id: string }>
+  meta?: unknown
+}
+const data = cohortData as CohortDataShape
+const MONTHS: Record<string, CohortMonth> = data.months ?? {}
+const COHORT_IDS: string[] = (data.cohorts ?? []).map((c) => c.id)
 
 /** Shift a "YYYY-MM-01" date by `delta` months. */
 function shiftMonths(date: string, delta: number): string {
@@ -85,10 +95,30 @@ export interface CerOptions {
   displayStart?: string
 }
 
+const EMPTY_SUMMARY = { latest: null, avg3: null, avg6: null, avg12: null }
+
+/** A valid, empty result used when computation fails (never throws). */
+function emptyModelResult(error?: unknown): ModelResult {
+  return {
+    id: 'employ-america',
+    points: [],
+    latestBreakeven: null,
+    latestActual: null,
+    actualSummary: { ...EMPTY_SUMMARY },
+    breakevenSummary: { ...EMPTY_SUMMARY },
+    computedAt: new Date().toISOString(),
+    meta: {
+      decomposition: null,
+      error: error instanceof Error ? error.message : error ? String(error) : null,
+    },
+  }
+}
+
 export async function computeEmployAmericaCER(
   options: CerOptions = {},
 ): Promise<ModelResult> {
-  const displayStart = options.displayStart ?? DEFAULT_DISPLAY_START
+  try {
+    const displayStart = options.displayStart ?? DEFAULT_DISPLAY_START
 
   const payemsObs = await fetchFredSeries(SERIES.PAYEMS, { startDate: FETCH_START })
   const payems = observationsToMap(payemsObs)
@@ -143,17 +173,21 @@ export async function computeEmployAmericaCER(
   const lastWithBreakeven = [...points].reverse().find((p) => p.breakeven != null)
   const lastWithActual = [...points].reverse().find((p) => p.actualNfp != null)
 
-  return {
-    id: 'employ-america',
-    points,
-    latestBreakeven: lastWithBreakeven?.breakeven ?? null,
-    latestActual: lastWithActual?.actualNfp ?? null,
-    actualSummary: summarize(actualSeries),
-    breakevenSummary: summarize(breakevenSeries),
-    computedAt: new Date().toISOString(),
-    meta: {
-      decomposition: latestDecomp,
-      cohortSource: cohortData.meta,
-    },
+    return {
+      id: 'employ-america',
+      points,
+      latestBreakeven: lastWithBreakeven?.breakeven ?? null,
+      latestActual: lastWithActual?.actualNfp ?? null,
+      actualSummary: summarize(actualSeries),
+      breakevenSummary: summarize(breakevenSeries),
+      computedAt: new Date().toISOString(),
+      meta: {
+        decomposition: latestDecomp,
+        cohortSource: data.meta,
+      },
+    }
+  } catch (err) {
+    console.error('computeEmployAmericaCER failed:', err)
+    return emptyModelResult(err)
   }
 }

@@ -6,10 +6,46 @@ import { MethodologyNote } from '@/components/MethodologyNote'
 import { formatK, formatMonthYear, formatLongDate } from '@/lib/formatting'
 import type { CerDecomposition } from '@/types/economic'
 
-export const revalidate = 21600 // 6 hours
+// Temporarily render at request time while we confirm the data pipeline on
+// Vercel (env vars + data/cer-cohorts.json). Switch back to `export const
+// revalidate = 21600` once the data is confirmed good.
+export const dynamic = 'force-dynamic'
+
+function ErrorState() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-semibold tracking-tight text-primary">
+          Employ America — Constant-Employment-Rate (CER)
+        </h2>
+      </div>
+      <div className="rounded-lg border border-border bg-surface p-8 text-center">
+        <p className="text-sm font-medium text-primary">
+          Data unavailable — check back after the next refresh
+        </p>
+        <p className="mt-2 text-xs text-secondary">
+          The breakeven series could not be computed (data source or
+          environment configuration may be temporarily unavailable).
+        </p>
+      </div>
+    </div>
+  )
+}
 
 export default async function EmployAmericaPage() {
-  const result = await computeEmployAmericaCER()
+  let result
+  try {
+    result = await computeEmployAmericaCER()
+  } catch (err) {
+    console.error('EmployAmericaPage failed to compute CER:', err)
+    return <ErrorState />
+  }
+
+  // The model returns an empty result rather than throwing on failure; treat
+  // that as the error state too.
+  if (!result.points.length) {
+    return <ErrorState />
+  }
 
   const latestPoint = [...result.points].reverse().find((p) => p.breakeven != null)
   const latestMonth = latestPoint?.date
