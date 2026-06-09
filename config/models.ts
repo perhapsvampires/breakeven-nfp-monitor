@@ -14,6 +14,6 @@ export const MODEL_TABS: ModelTab[] = [
   { slug: 'hamilton-project', label: 'Hamilton Project', enabled: false },
   { slug: 'sf-fed', label: 'SF Fed', enabled: false },
   { slug: 'fed-board', label: 'Fed Board', enabled: false },
-  { slug: 'dallas-fed', label: 'Dallas Fed', enabled: false },
+  { slug: 'dallas-fed', label: 'Dallas Fed', enabled: true },
   { slug: 'ai-summary', label: 'AI Summary', enabled: false },
 ]

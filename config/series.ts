@@ -17,6 +17,7 @@ export const SERIES = {
   CIVPART: 'CIVPART', // Labor force participation rate, SA, %
   UNRATE: 'UNRATE', // Unemployment rate, SA, %
   EMRATIO: 'EMRATIO', // Employment-population ratio (overall), SA, %
+  POPTHM: 'POPTHM', // Total U.S. resident population, monthly, thousands
 
   // Structural
   NROU: 'NROU', // Noncyclical rate of unemployment (CBO), quarterly, %

@@ -44,6 +44,15 @@ export interface ModelResult {
   meta?: Record<string, unknown>
 }
 
+/** Dallas Fed (Cheremukhin) three-component decomposition point (thousands/month). */
+export interface CheremukhinComponentPoint {
+  date: string
+  pop: number | null // population-growth contribution
+  lfp: number | null // labor-force-participation cycle contribution
+  structural: number | null // structural CNP/POP ratio contribution
+  breakeven: number | null // sum of the three
+}
+
 /** Employ America CER decomposition for the latest window (thousands/month). */
 export interface CerDecomposition {
   /** Observed NFP growth contribution. */
