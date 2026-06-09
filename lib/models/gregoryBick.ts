@@ -52,11 +52,32 @@ export interface GregoryBickOptions {
   displayStart?: string
 }
 
+const EMPTY_SUMMARY = { latest: null, avg3: null, avg6: null, avg12: null }
+
+/** A valid, empty result used when computation fails (never throws). */
+function emptyModelResult(error?: unknown): ModelResult {
+  return {
+    id: 'stlouis-fed',
+    points: [],
+    latestBreakeven: null,
+    latestActual: null,
+    actualSummary: { ...EMPTY_SUMMARY },
+    breakevenSummary: { ...EMPTY_SUMMARY },
+    computedAt: new Date().toISOString(),
+    meta: {
+      cbo: CBO_POP_GROWTH,
+      decomposition: null,
+      error: error instanceof Error ? error.message : error ? String(error) : null,
+    },
+  }
+}
+
 export async function computeGregoryBick(
   options: GregoryBickOptions = {},
 ): Promise<ModelResult> {
-  const displayStart = options.displayStart ?? DEFAULT_DISPLAY_START
-  const endYear = new Date().getFullYear()
+  try {
+    const displayStart = options.displayStart ?? DEFAULT_DISPLAY_START
+    const endYear = new Date().getFullYear()
 
   const [payemsObs, civpartObs, unrateObs, lns16Obs] = await Promise.all([
     fetchFredSeries(SERIES.PAYEMS, { startDate: FETCH_START }),
@@ -131,19 +152,23 @@ export async function computeGregoryBick(
       ? lastWithActual.actualNfp - latestCalc.breakeven
       : null
 
-  return {
-    id: 'stlouis-fed',
-    points,
-    latestBreakeven: latestCalc?.breakeven ?? null,
-    latestActual: lastWithActual?.actualNfp ?? null,
-    actualSummary: summarize(points.map((p) => p.actualNfp)),
-    breakevenSummary: summarize(points.map((p) => p.breakeven)),
-    computedAt: new Date().toISOString(),
-    meta: {
-      headlineMonth: latestMonth,
-      gap,
-      cbo: CBO_POP_GROWTH,
-      decomposition: latestCalc,
-    },
+    return {
+      id: 'stlouis-fed',
+      points,
+      latestBreakeven: latestCalc?.breakeven ?? null,
+      latestActual: lastWithActual?.actualNfp ?? null,
+      actualSummary: summarize(points.map((p) => p.actualNfp)),
+      breakevenSummary: summarize(points.map((p) => p.breakeven)),
+      computedAt: new Date().toISOString(),
+      meta: {
+        headlineMonth: latestMonth,
+        gap,
+        cbo: CBO_POP_GROWTH,
+        decomposition: latestCalc,
+      },
+    }
+  } catch (err) {
+    console.error('computeGregoryBick failed:', err)
+    return emptyModelResult(err)
   }
 }

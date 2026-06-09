@@ -6,7 +6,10 @@ import { MethodologyNote } from '@/components/MethodologyNote'
 import { formatK, formatMonthYear, formatLongDate } from '@/lib/formatting'
 import type { CboPopGrowthConfig } from '@/config/scenarios.config'
 
-export const revalidate = 21600
+// Temporarily render at request time while we confirm the data pipeline on
+// Vercel (env vars, FRED + BLS). Switch back to `export const revalidate =
+// 21600` once confirmed good.
+export const dynamic = 'force-dynamic'
 
 interface Decomp {
   breakeven: number
@@ -16,8 +19,39 @@ interface Decomp {
   surveyAdj: number
 }
 
+function ErrorState() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-semibold tracking-tight text-primary">
+          St. Louis Fed — Gregory &amp; Bick
+        </h2>
+      </div>
+      <div className="rounded-lg border border-border bg-surface p-8 text-center">
+        <p className="text-sm font-medium text-primary">
+          Data unavailable — check back after the next refresh
+        </p>
+        <p className="mt-2 text-xs text-secondary">
+          The breakeven series could not be computed (data source or
+          environment configuration may be temporarily unavailable).
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export default async function StLouisFedPage() {
-  const result = await computeGregoryBick()
+  let result
+  try {
+    result = await computeGregoryBick()
+  } catch (err) {
+    console.error('StLouisFedPage failed to compute breakeven:', err)
+    return <ErrorState />
+  }
+
+  if (!result.points.length) {
+    return <ErrorState />
+  }
 
   const headlineMonth = (result.meta?.headlineMonth as string | null) ?? null
   const gap = (result.meta?.gap as number | null) ?? null
