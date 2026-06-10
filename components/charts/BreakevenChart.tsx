@@ -25,6 +25,8 @@ const COLORS = {
   zero: '#94a3b8',
   recession: 'rgba(100,116,139,0.08)',
   select: 'rgba(29,78,216,0.10)',
+  band: 'rgba(22,163,74,0.08)', // long-run reference band
+  bandLine: '#16a34a',
 }
 
 // Window whose 12-month-window distortions are excluded from the *default*
@@ -54,11 +56,14 @@ interface BreakevenChartProps {
   points: BreakevenPoint[]
   /** Date range excluded from the default y-fit (defaults to the COVID window). */
   outlierWindow?: { start: string; end: string }
+  /** Optional horizontal reference band (e.g. a long-run structural range). */
+  referenceBand?: { low: number; high: number; label?: string }
 }
 
 export function BreakevenChart({
   points,
   outlierWindow = DEFAULT_OUTLIER_WINDOW,
+  referenceBand,
 }: BreakevenChartProps) {
   const [zoom, setZoom] = useState<{ left: string; right: string } | null>(null)
   const [sel, setSel] = useState<{ a: string | null; b: string | null }>({
@@ -77,14 +82,27 @@ export function BreakevenChart({
     return points.slice(lo, hi + 1)
   }, [points, zoom])
 
-  // Y domain: exact fit when zoomed; outlier-excluded fit by default.
+  // Y domain: exact fit when zoomed; outlier-excluded fit by default. Always
+  // widen to include the reference band so it stays visible.
   const yDomain = useMemo<YDomain>(() => {
-    if (zoom) return computeYDomain(visible)
-    const filtered = points.filter(
-      (p) => p.date < outlierWindow.start || p.date > outlierWindow.end,
-    )
-    return computeYDomain(filtered.length ? filtered : points)
-  }, [points, visible, zoom, outlierWindow])
+    const base = zoom
+      ? computeYDomain(visible)
+      : computeYDomain(
+          points.filter(
+            (p) => p.date < outlierWindow.start || p.date > outlierWindow.end,
+          ).length
+            ? points.filter(
+                (p) => p.date < outlierWindow.start || p.date > outlierWindow.end,
+              )
+            : points,
+        )
+    if (referenceBand && base[0] !== 'auto') {
+      const lo = Math.min(base[0] as number, referenceBand.low)
+      const hi = Math.max(base[1] as number, referenceBand.high)
+      return [lo, hi]
+    }
+    return base
+  }, [points, visible, zoom, outlierWindow, referenceBand])
 
   if (points.length === 0) {
     return (
@@ -153,6 +171,31 @@ export function BreakevenChart({
             onDoubleClick={() => setZoom(null)}
           >
             <CartesianGrid stroke={COLORS.grid} vertical={false} />
+            {referenceBand && (
+              <ReferenceArea
+                y1={referenceBand.low}
+                y2={referenceBand.high}
+                fill={COLORS.band}
+                stroke="none"
+              />
+            )}
+            {referenceBand && (
+              <ReferenceLine
+                y={(referenceBand.low + referenceBand.high) / 2}
+                stroke={COLORS.bandLine}
+                strokeDasharray="4 4"
+                label={
+                  referenceBand.label
+                    ? {
+                        value: referenceBand.label,
+                        position: 'insideBottomRight',
+                        fill: COLORS.bandLine,
+                        fontSize: 11,
+                      }
+                    : undefined
+                }
+              />
+            )}
             {bands.map((b, i) => (
               <ReferenceArea
                 key={`rec-${i}`}
