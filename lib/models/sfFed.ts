@@ -40,6 +40,13 @@ const TERMINAL = { baseline: 80, high: 200 } // thousands/month LF growth
 const DEFAULT_DISPLAY_START = '2022-01-01'
 const CLF_START = '1948-01-01'
 const PAYEMS_START = '2021-06-01'
+// The 2020-21 COVID labor-force crash/rebound is a large transient that the
+// band-pass filter would "ring" off of (a spurious dip ~early 2022 then an
+// overshoot), distorting the short-run trend. Treat the pandemic months as an
+// outlier and linearly interpolate the labor-force level across them before
+// filtering — standard practice for trend extraction around COVID.
+const COVID_FROM = '2020-02-01'
+const COVID_TO = '2021-07-01'
 
 interface SfPoint extends BreakevenPoint {
   shortRun: number | null // realized short-run (solid)
@@ -52,6 +59,19 @@ function shiftMonths(date: string, delta: number): string {
   const [y, m] = date.split('-').map(Number)
   const idx = y * 12 + (m - 1) + delta
   return `${Math.floor(idx / 12)}-${String((idx % 12) + 1).padStart(2, '0')}-01`
+}
+
+/** Linearly interpolate the COVID-period level between its endpoints. */
+function interpolateCovid(dates: string[], levels: number[]): number[] {
+  const i0 = dates.indexOf(COVID_FROM)
+  const i1 = dates.indexOf(COVID_TO)
+  if (i0 < 0 || i1 < 0 || i1 <= i0) return levels.slice()
+  const out = levels.slice()
+  for (let i = i0 + 1; i < i1; i++) {
+    const f = (i - i0) / (i1 - i0)
+    out[i] = levels[i0] + (levels[i1] - levels[i0]) * f
+  }
+  return out
 }
 
 /** Month-over-month growth of a filtered level, scaled by (1 − u). */
@@ -94,15 +114,17 @@ export async function computeSfFed(options: SfFedOptions = {}): Promise<ModelRes
 
     const dates = clf.map((o) => o.date)
     const lastRealized = dates[dates.length - 1]
+    // De-step January control jumps, then interpolate the COVID transient.
     const deStepped = deStepJanuary(clf).adjusted
+    const adjusted = interpolateCovid(dates, deStepped)
 
     // Latest smoothed LF-growth pace (g0) to anchor the forward projection.
-    const srTrend = cfLowPass(deStepped, SHORT_CUTOFF)
+    const srTrend = cfLowPass(adjusted, SHORT_CUTOFF)
     const g0 = srTrend[srTrend.length - 1] - srTrend[srTrend.length - 2]
 
     // Forward projection of the LF level under a terminal growth pace.
     function project(terminal: number): { levels: number[]; dates: string[] } {
-      const levels = deStepped.slice()
+      const levels = adjusted.slice()
       const ds = dates.slice()
       let last = levels[levels.length - 1]
       for (let k = 1; k <= PROJECT_MONTHS; k++) {

@@ -154,7 +154,9 @@ export default async function SfFedPage() {
         <p>
           CLF16OV&rsquo;s January CPS population-control level jumps are removed
           before filtering (a +2.2M Jan-2025 step would otherwise spike the
-          short-run trend). Realized values run well below the July-2024 paper
+          short-run trend), and the 2020–21 COVID crash/rebound is interpolated
+          as an outlier so the band-pass doesn&rsquo;t ring off it (which had
+          produced a spurious early-2022 dip). Realized values run well below the July-2024 paper
           because net immigration reversed after 2024, genuinely collapsing the
           short-run rate — a useful sanity check, not an error. Long-run sits at
           the upper edge of the paper&rsquo;s 70–90k (aggregate FRED data vs the
