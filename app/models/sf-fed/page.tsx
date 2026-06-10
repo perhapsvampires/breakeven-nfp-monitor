@@ -1,5 +1,5 @@
 import { computeSfFed } from '@/lib/models/sfFed'
-import { BreakevenChart } from '@/components/charts/BreakevenChart'
+import { BreakevenChart, type BreakevenSeries } from '@/components/charts/BreakevenChart'
 import { ModelCard } from '@/components/ModelCard'
 import { MetricsRow } from '@/components/MetricsRow'
 import { MethodologyNote } from '@/components/MethodologyNote'
@@ -7,11 +7,12 @@ import { formatK, formatMonthYear, formatLongDate } from '@/lib/formatting'
 
 export const dynamic = 'force-dynamic'
 
-interface LongRun {
-  low: number
-  high: number
-  mid: number
-}
+const SERIES: BreakevenSeries[] = [
+  { key: 'shortRun', label: 'Short-run breakeven', color: '#1d4ed8' },
+  { key: 'srHighProj', label: 'Short-run · high immig. (proj.)', color: '#dc2626', dashed: true },
+  { key: 'srBaseProj', label: 'Short-run · baseline (proj.)', color: '#1d4ed8', dashed: true },
+  { key: 'longRun', label: 'Long-run breakeven', color: '#64748b' },
+]
 
 function ErrorState() {
   return (
@@ -44,8 +45,20 @@ export default async function SfFedPage() {
   }
   if (!result.points.length) return <ErrorState />
 
-  const longRun = (result.meta?.longRun as LongRun) ?? { low: 70, high: 90, mid: 75 }
-  const shortRunMonth = (result.meta?.shortRunMonth as string | null) ?? null
+  const lastRealized = (result.meta?.lastRealized as string | null) ?? null
+  const latestLongRun = (result.meta?.latestLongRun as number | null) ?? null
+  const gap =
+    result.latestActual != null && result.latestBreakeven != null
+      ? result.latestActual - result.latestBreakeven
+      : null
+
+  const legend: Array<{ label: string; color: string; dashed?: boolean }> = [
+    { label: 'Actual NFP (MoM)', color: '#93c5fd' },
+    { label: 'Short-run breakeven', color: '#1d4ed8' },
+    { label: 'High-immig. proj.', color: '#dc2626', dashed: true },
+    { label: 'Baseline proj.', color: '#1d4ed8', dashed: true },
+    { label: 'Long-run', color: '#64748b' },
+  ]
 
   return (
     <div className="space-y-6">
@@ -55,13 +68,13 @@ export default async function SfFedPage() {
             SF Fed — Petrosky-Nadeau &amp; Stewart
           </h2>
           <p className="mt-1 text-sm text-secondary">
-            A stable long-run structural breakeven versus a cyclically variable
-            short-run rate from labor-force growth.
+            Band-pass-filtered trend labor-force growth × (1 − u): a structural
+            long-run rate versus a cyclically variable short-run rate.
           </p>
         </div>
-        {shortRunMonth && (
+        {lastRealized && (
           <p className="text-xs text-tertiary">
-            Latest data: {formatMonthYear(shortRunMonth)} · Updated{' '}
+            Realized through {formatMonthYear(lastRealized)} · Updated{' '}
             {formatLongDate(new Date(result.computedAt))}
           </p>
         )}
@@ -71,66 +84,81 @@ export default async function SfFedPage() {
         <ModelCard
           label="Short-run breakeven"
           value={formatK(result.latestBreakeven, false)}
-          sub="6-month avg of labor-force growth"
+          sub={lastRealized ? `${formatMonthYear(lastRealized)}, cyclical` : undefined}
         />
         <ModelCard
           label="Long-run breakeven"
-          value={`${longRun.low}–${longRun.high}k`}
-          sub={`Structural trend (~${longRun.mid}k)`}
+          value={formatK(latestLongRun, false)}
+          sub="Structural (40-yr trend)"
         />
         <ModelCard
           label="Actual NFP"
           value={formatK(result.latestActual)}
-          sub="Latest monthly print"
+          sub={gap == null ? 'Latest print' : gap >= 0 ? 'Above short-run breakeven' : 'Below short-run breakeven'}
+          accent={gap == null ? 'neutral' : gap >= 0 ? 'positive' : 'negative'}
         />
       </div>
 
       <div className="rounded-lg border border-border bg-surface p-5">
-        <div className="mb-3 flex flex-wrap items-center gap-4 text-xs text-secondary">
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-3 rounded-sm bg-chart-bar" />
-            Actual NFP (MoM)
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block h-0.5 w-4 bg-chart-line" />
-            Short-run breakeven
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-3 rounded-sm" style={{ background: 'rgba(22,163,74,0.25)' }} />
-            Long-run band (~{longRun.low}–{longRun.high}k)
-          </span>
+        <div className="mb-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-secondary">
+          {legend.map((l) => (
+            <span key={l.label} className="flex items-center gap-1.5">
+              <span
+                className="inline-block h-0.5 w-4"
+                style={{
+                  background: l.dashed
+                    ? `repeating-linear-gradient(90deg, ${l.color} 0 4px, transparent 4px 7px)`
+                    : l.color,
+                  height: l.label.includes('NFP') ? 10 : 2,
+                  width: l.label.includes('NFP') ? 12 : 16,
+                  borderRadius: l.label.includes('NFP') ? 2 : 0,
+                }}
+              />
+              {l.label}
+            </span>
+          ))}
         </div>
-        <BreakevenChart
-          points={result.points}
-          referenceBand={{ low: longRun.low, high: longRun.high, label: `Long-run ~${longRun.mid}k` }}
-        />
+        <p className="mb-3 text-xs text-tertiary">
+          Solid lines are realized (band-pass trend); dashed lines beyond{' '}
+          {lastRealized ? formatMonthYear(lastRealized) : 'the latest data'} are
+          forward projections under baseline vs high-immigration scenarios.
+        </p>
+        <BreakevenChart points={result.points} series={SERIES} />
       </div>
 
       <MetricsRow actual={result.actualSummary} breakeven={result.breakevenSummary} />
 
       <div className="rounded-lg border border-accent/20 bg-accent/5 p-5 text-sm leading-relaxed text-primary">
-        The structural (long-run) breakeven is a stable ~{longRun.low}–
-        {longRun.high}k/month. The short-run rate tracks labor-force growth and
-        swings widely with the cycle — it peaked near 230k during the 2023–24
-        immigration surge and has fallen sharply as net immigration reversed.
+        The long-run structural breakeven is stable around{' '}
+        {formatK(latestLongRun, false)}/month. The short-run rate is cyclically
+        variable — it peaked near 230–290k during the 2023–24 immigration surge
+        and has since fallen sharply (now near the long-run, even below it) as net
+        immigration reversed. The dashed lines show how it would evolve if
+        immigration stays low (baseline) versus rebounds (high).
       </div>
 
       <MethodologyNote
         source="Nicolas Petrosky-Nadeau & Stephanie Stewart, FRBSF Economic Letter 2024-18, July 8, 2024."
-        vintage="FRED CLF16OV (labor force), PAYEMS; long-run band ~70–90k from the paper's band-pass filter"
+        vintage="FRED CLF16OV (1948–present) + PAYEMS; Christiano-Fitzgerald band-pass; scenario projections"
       >
         <p>
-          The short-run breakeven is a 6-month moving average of monthly
-          labor-force growth (CLF16OV), excluding January transitions because
-          CPS population controls are revised each January as a one-time level
-          step. The long-run breakeven is shown as a flat ~{longRun.low}–
-          {longRun.high}k band (midpoint {longRun.mid}k), approximating the
-          structural rate the paper extracts with a band-pass filter.
+          Breakeven = trend labor-force growth × (1 − u), u = 3.8%. Trends are
+          extracted with a Christiano-Fitzgerald band-pass (low-pass) filter on
+          the civilian labor-force level: the <strong>long-run</strong> trend
+          keeps movements at the 40-year+ horizon (~{formatK(latestLongRun, false)}
+          /month here), and the <strong>short-run</strong> trend keeps movements
+          down to ~18-month horizons (cyclically elevated by the 2022–24
+          immigration surge). The labor force is projected forward 24 months under
+          baseline vs high-immigration scenarios (dashed).
         </p>
         <p>
-          The short-run series is cyclical and noisy by design; windows
-          disrupted by the October 2025 CPS data gap (government shutdown) are
-          omitted rather than averaged from too few months.
+          CLF16OV&rsquo;s January CPS population-control level jumps are removed
+          before filtering (a +2.2M Jan-2025 step would otherwise spike the
+          short-run trend). Realized values run well below the July-2024 paper
+          because net immigration reversed after 2024, genuinely collapsing the
+          short-run rate — a useful sanity check, not an error. Long-run sits at
+          the upper edge of the paper&rsquo;s 70–90k (aggregate FRED data vs the
+          paper&rsquo;s CPS microdata by age/sex/race).
         </p>
       </MethodologyNote>
     </div>

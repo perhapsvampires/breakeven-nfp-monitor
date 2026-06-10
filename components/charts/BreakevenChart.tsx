@@ -15,7 +15,37 @@ import {
 } from 'recharts'
 import type { BreakevenPoint } from '@/types/economic'
 import { RECESSIONS } from '@/config/recession-dates'
+import { formatK, formatMonthYear } from '@/lib/formatting'
 import { ChartTooltip } from './ChartTooltip'
+
+/**
+ * A chart point: the standard breakeven fields plus any number of extra
+ * numeric series keys (referenced by `series[].key`).
+ *
+ * Note: this is intentionally NOT an index-signature intersection — that would
+ * make a plain `BreakevenPoint` non-assignable. Extra series keys are read with
+ * a runtime-safe lookup helper instead, so callers can pass either a plain
+ * `BreakevenPoint[]` or objects with arbitrary extra numeric fields.
+ */
+export type BreakevenChartPoint = BreakevenPoint
+
+/** Safely read an arbitrary numeric series key off a chart point. */
+function readNum(point: BreakevenChartPoint, key: string): number | null {
+  const v = (point as unknown as Record<string, unknown>)[key]
+  return typeof v === 'number' ? v : null
+}
+
+/** A single extra breakeven line rendered when `series` is provided. */
+export interface BreakevenSeries {
+  /** Numeric field on each point to plot. */
+  key: string
+  /** Display name (legend / tooltip). */
+  label: string
+  /** Stroke color. */
+  color: string
+  /** Render as a dashed line. */
+  dashed?: boolean
+}
 
 const COLORS = {
   bar: '#93c5fd',
@@ -35,12 +65,23 @@ const DEFAULT_OUTLIER_WINDOW = { start: '2020-03-01', end: '2021-12-01' }
 
 type YDomain = [number, number] | ['auto', 'auto']
 
-/** Nice-rounded [min, max] covering the actual + breakeven values in `pts`. */
-function computeYDomain(pts: BreakevenPoint[]): YDomain {
+/**
+ * Nice-rounded [min, max] covering the actual NFP plus the plotted line
+ * values in `pts`. When `seriesKeys` is non-empty those keys are scanned
+ * instead of the default `breakeven` field; otherwise `breakeven` is used.
+ */
+function computeYDomain(
+  pts: BreakevenChartPoint[],
+  seriesKeys: string[] = [],
+): YDomain {
+  const lineKeys = seriesKeys.length > 0 ? seriesKeys : ['breakeven']
   const vals: number[] = []
   for (const p of pts) {
     if (p.actualNfp != null) vals.push(p.actualNfp)
-    if (p.breakeven != null) vals.push(p.breakeven)
+    for (const k of lineKeys) {
+      const v = readNum(p, k)
+      if (v != null) vals.push(v)
+    }
   }
   if (vals.length === 0) return ['auto', 'auto']
   let lo = Math.min(...vals, 0)
@@ -52,18 +93,75 @@ function computeYDomain(pts: BreakevenPoint[]): YDomain {
   return [Math.floor(lo / step) * step, Math.ceil(hi / step) * step]
 }
 
+/**
+ * Tooltip used when `series` is provided: shows the date, Actual NFP, and one
+ * row per series (label → value) in the series color.
+ */
+function MultiSeriesTooltip({
+  active,
+  payload,
+  label,
+  series,
+}: {
+  active?: boolean
+  label?: string
+  payload?: Array<{ payload: BreakevenChartPoint }>
+  series: BreakevenSeries[]
+}) {
+  if (!active || !payload || payload.length === 0) return null
+  const point = payload[0].payload
+  return (
+    <div className="rounded-md border border-border bg-surface px-3 py-2 text-xs shadow-sm">
+      <p className="mb-1 font-medium text-primary">
+        {formatMonthYear(label ?? point.date)}
+      </p>
+      <dl className="space-y-0.5 tnum">
+        <div className="flex justify-between gap-6">
+          <dt className="text-secondary">Actual NFP</dt>
+          <dd className="text-primary">{formatK(point.actualNfp)}</dd>
+        </div>
+        {series.map((s) => (
+          <div key={s.key} className="flex justify-between gap-6">
+            <dt className="text-secondary" style={{ color: s.color }}>
+              {s.label}
+            </dt>
+            <dd className="text-primary">
+              {formatK(readNum(point, s.key), false)}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  )
+}
+
 interface BreakevenChartProps {
-  points: BreakevenPoint[]
+  /**
+   * Chart points. Pass a plain `BreakevenPoint[]` (default single-line usage)
+   * or points that also carry extra numeric fields named by `series[].key`
+   * (multi-line usage). Extra keys are read with a runtime-safe lookup, so the
+   * declared element type stays `BreakevenPoint` and any `BreakevenPoint[]`
+   * (or wider, with extra fields) remains assignable.
+   */
+  points: BreakevenChartPoint[]
   /** Date range excluded from the default y-fit (defaults to the COVID window). */
   outlierWindow?: { start: string; end: string }
   /** Optional horizontal reference band (e.g. a long-run structural range). */
   referenceBand?: { low: number; high: number; label?: string }
+  /**
+   * Optional multiple breakeven lines. When provided, one line is rendered per
+   * entry (using `key` as the numeric dataKey) INSTEAD of the default single
+   * `breakeven` line, and a multi-series tooltip is used. Each `key` must exist
+   * as a numeric field on the point objects.
+   */
+  series?: BreakevenSeries[]
 }
 
 export function BreakevenChart({
   points,
   outlierWindow = DEFAULT_OUTLIER_WINDOW,
   referenceBand,
+  series,
 }: BreakevenChartProps) {
   const [zoom, setZoom] = useState<{ left: string; right: string } | null>(null)
   const [sel, setSel] = useState<{ a: string | null; b: string | null }>({
@@ -85,8 +183,9 @@ export function BreakevenChart({
   // Y domain: exact fit when zoomed; outlier-excluded fit by default. Always
   // widen to include the reference band so it stays visible.
   const yDomain = useMemo<YDomain>(() => {
+    const seriesKeys = series?.map((s) => s.key) ?? []
     const base = zoom
-      ? computeYDomain(visible)
+      ? computeYDomain(visible, seriesKeys)
       : computeYDomain(
           points.filter(
             (p) => p.date < outlierWindow.start || p.date > outlierWindow.end,
@@ -95,6 +194,7 @@ export function BreakevenChart({
                 (p) => p.date < outlierWindow.start || p.date > outlierWindow.end,
               )
             : points,
+          seriesKeys,
         )
     if (referenceBand && base[0] !== 'auto') {
       const lo = Math.min(base[0] as number, referenceBand.low)
@@ -102,7 +202,7 @@ export function BreakevenChart({
       return [lo, hi]
     }
     return base
-  }, [points, visible, zoom, outlierWindow, referenceBand])
+  }, [points, visible, zoom, outlierWindow, referenceBand, series])
 
   if (points.length === 0) {
     return (
@@ -232,7 +332,13 @@ export function BreakevenChart({
             />
             <ReferenceLine y={0} stroke={COLORS.zero} strokeDasharray="3 3" />
             <Tooltip
-              content={<ChartTooltip />}
+              content={
+                series && series.length > 0 ? (
+                  <MultiSeriesTooltip series={series} />
+                ) : (
+                  <ChartTooltip />
+                )
+              }
               cursor={{ fill: 'rgba(0,0,0,0.03)' }}
             />
             <Bar
@@ -242,15 +348,31 @@ export function BreakevenChart({
               radius={[2, 2, 0, 0]}
               isAnimationActive={false}
             />
-            <Line
-              dataKey="breakeven"
-              name="Breakeven"
-              stroke={COLORS.line}
-              strokeWidth={2}
-              dot={false}
-              connectNulls
-              isAnimationActive={false}
-            />
+            {series && series.length > 0 ? (
+              series.map((s) => (
+                <Line
+                  key={s.key}
+                  dataKey={s.key}
+                  name={s.label}
+                  stroke={s.color}
+                  strokeWidth={2}
+                  strokeDasharray={s.dashed ? '5 4' : undefined}
+                  dot={false}
+                  connectNulls
+                  isAnimationActive={false}
+                />
+              ))
+            ) : (
+              <Line
+                dataKey="breakeven"
+                name="Breakeven"
+                stroke={COLORS.line}
+                strokeWidth={2}
+                dot={false}
+                connectNulls
+                isAnimationActive={false}
+              />
+            )}
           </ComposedChart>
         </ResponsiveContainer>
       </div>
