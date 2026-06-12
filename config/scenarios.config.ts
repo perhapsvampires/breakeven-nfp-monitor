@@ -1,5 +1,5 @@
 // Immigration scenarios shared by the immigration-sensitive models
-// (St. Louis Fed, Hamilton Project, Fed Board, Dallas Fed).
+// (St. Louis Fed, Brookings, Fed Board, Dallas Fed).
 //
 // UPDATE THIS FILE when CBO/Census/Brookings publish new immigration estimates:
 // change `monthlyNetImmigration` and `vintageDate`. No code changes needed.

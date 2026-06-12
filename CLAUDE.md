@@ -99,7 +99,7 @@ Every model chart shows:
 │   │   ├── sf-fed/page.tsx
 │   │   ├── dallas-fed/page.tsx
 │   │   ├── fed-board/page.tsx
-│   │   ├── hamilton-project/page.tsx
+│   │   ├── brookings/page.tsx
 │   │   ├── frbsf-2016/page.tsx
 │   │   └── ai-summary/page.tsx
 │   └── api/
@@ -116,7 +116,7 @@ Every model chart shows:
 │       ├── sfFedBandpass.ts
 │       ├── cheremukhin.ts
 │       ├── murrayVidangos.ts
-│       ├── edelbergWatson.ts
+│       ├── brookings.ts
 │       └── frbsf2016.ts
 ├── config/
 │   ├── series.ts                # All FRED series IDs as typed constants
@@ -307,7 +307,7 @@ All FRED API calls go through `/app/api/fred/route.ts` (a Route Handler) when ca
 1. **Employ America CER** — FRED-only, build and validate end-to-end pipeline first
 2. **St. Louis Fed (Gregory & Bick)** — simple formula, good second step
 3. **FRBSF 2016 (Bidder et al.)** — historical baseline, mostly FRED
-4. **Hamilton Project (Edelberg & Watson)** — adds scenario toggle
+4. **Brookings (Edelberg & Watson)** — adds scenario toggle
 5. **SF Fed (Petrosky-Nadeau)** — adds band-pass filter complexity
 6. **Fed Board (Murray & Vidangos)** — adds CBO ZIP static data
 7. **Dallas Fed (Cheremukhin)** — most complex, needs all components
@@ -390,7 +390,7 @@ NaturalRate = NROU (from FRED, currently ~4.4%).
 
 ---
 
-### Model 4: Hamilton Project — Edelberg & Watson
+### Model 4: Brookings — Edelberg & Watson
 
 **Source:** Wendy Edelberg & Tara Watson, Hamilton Project / Brookings, March 2024.
 
@@ -528,7 +528,7 @@ Here are the current breakeven estimates from seven methodologies:
 - Employ America CER: [X,000]
 - St. Louis Fed (Gregory & Bick, [scenario]): [X,000]
 - FRBSF 2016 Baseline: [X,000]
-- Hamilton Project (Edelberg & Watson, [scenario]): [X,000]–[Y,000]
+- Brookings (Edelberg & Watson, [scenario]): [X,000]–[Y,000]
 - SF Fed (Petrosky-Nadeau): Long-run ~[X,000], Short-run [Y,000]
 - Fed Board (Murray & Vidangos, [scenario]): [X,000]
 - Dallas Fed (Cheremukhin, [scenario]): [X,000]

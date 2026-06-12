@@ -11,7 +11,7 @@ export const MODEL_TABS: ModelTab[] = [
   { slug: 'employ-america', label: 'Employ America CER', enabled: true },
   { slug: 'stlouis-fed', label: 'St. Louis Fed', enabled: true },
   { slug: 'frbsf-2016', label: 'FRBSF 2016', enabled: false },
-  { slug: 'hamilton-project', label: 'Hamilton Project', enabled: false },
+  { slug: 'brookings', label: 'Brookings', enabled: true },
   { slug: 'sf-fed', label: 'SF Fed', enabled: true },
   { slug: 'fed-board', label: 'Fed Board', enabled: false },
   { slug: 'dallas-fed', label: 'Dallas Fed', enabled: true },

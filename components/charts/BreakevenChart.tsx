@@ -155,6 +155,8 @@ interface BreakevenChartProps {
    * as a numeric field on the point objects.
    */
   series?: BreakevenSeries[]
+  /** Additional flat horizontal reference lines (e.g. a historical baseline). */
+  extraLines?: Array<{ y: number; label?: string; color?: string; dashed?: boolean }>
 }
 
 export function BreakevenChart({
@@ -162,6 +164,7 @@ export function BreakevenChart({
   outlierWindow = DEFAULT_OUTLIER_WINDOW,
   referenceBand,
   series,
+  extraLines,
 }: BreakevenChartProps) {
   const [zoom, setZoom] = useState<{ left: string; right: string } | null>(null)
   const [sel, setSel] = useState<{ a: string | null; b: string | null }>({
@@ -196,13 +199,21 @@ export function BreakevenChart({
             : points,
           seriesKeys,
         )
-    if (referenceBand && base[0] !== 'auto') {
-      const lo = Math.min(base[0] as number, referenceBand.low)
-      const hi = Math.max(base[1] as number, referenceBand.high)
-      return [lo, hi]
+    let lo = base[0]
+    let hi = base[1]
+    if (lo === 'auto' || hi === 'auto') return base
+    if (referenceBand) {
+      lo = Math.min(lo, referenceBand.low)
+      hi = Math.max(hi, referenceBand.high)
     }
-    return base
-  }, [points, visible, zoom, outlierWindow, referenceBand, series])
+    if (extraLines?.length) {
+      for (const l of extraLines) {
+        lo = Math.min(lo, l.y)
+        hi = Math.max(hi, l.y)
+      }
+    }
+    return [lo, hi]
+  }, [points, visible, zoom, outlierWindow, referenceBand, series, extraLines])
 
   if (points.length === 0) {
     return (
@@ -296,6 +307,24 @@ export function BreakevenChart({
                 }
               />
             )}
+            {extraLines?.map((l, i) => (
+              <ReferenceLine
+                key={`extra-${i}`}
+                y={l.y}
+                stroke={l.color ?? COLORS.axis}
+                strokeDasharray={l.dashed === false ? undefined : '3 3'}
+                label={
+                  l.label
+                    ? {
+                        value: l.label,
+                        position: 'insideTopRight',
+                        fill: l.color ?? COLORS.axis,
+                        fontSize: 11,
+                      }
+                    : undefined
+                }
+              />
+            ))}
             {bands.map((b, i) => (
               <ReferenceArea
                 key={`rec-${i}`}
