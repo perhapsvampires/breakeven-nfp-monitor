@@ -1,0 +1,2002 @@
+{
+  "meta": {
+    "generatedAt": "2026-06-10T17:39:25.395Z",
+    "source": "U.S. Census Bureau, 2023 National Population Projections, detailed files np2023_d1_{mid,hi,low}.csv",
+    "sourceUrls": {
+      "baseline": "https://www2.census.gov/programs-surveys/popproj/datasets/2023/2023-popproj/np2023_d1_mid.csv",
+      "high": "https://www2.census.gov/programs-surveys/popproj/datasets/2023/2023-popproj/np2023_d1_hi.csv",
+      "low": "https://www2.census.gov/programs-surveys/popproj/datasets/2023/2023-popproj/np2023_d1_low.csv"
+    },
+    "concept": "resident",
+    "method": "census-2023-npp",
+    "vintage": "2023 National Population Projections (released Nov 2023)",
+    "referenceDate": "July 1 (mid-year)",
+    "units": "thousands of persons",
+    "scenarios": [
+      "baseline",
+      "high",
+      "low"
+    ],
+    "scenarioMapping": {
+      "baseline": "Census 2023 NPP Main series (np2023_d1_mid.csv)",
+      "high": "Census 2023 NPP High-immigration scenario (np2023_d1_hi.csv)",
+      "low": "Census 2023 NPP Low-immigration scenario (np2023_d1_low.csv)"
+    },
+    "ageBands": [
+      "16-24",
+      "25-34",
+      "35-44",
+      "45-54",
+      "55-64",
+      "65+"
+    ],
+    "sexes": [
+      "M",
+      "F"
+    ],
+    "years": [
+      2024,
+      2025,
+      2026,
+      2027,
+      2028,
+      2029,
+      2030,
+      2031,
+      2032
+    ],
+    "notes": "RESIDENT population (all persons, all races/origins, ORIGIN=0 & RACE=0), single year of age summed into 6 bands; SEX 1->M, 2->F. This is NOT the civilian-noninstitutional (CNI) 16+ concept used by the labor-force/LFP models: it includes Armed Forces and the institutionalized, and uses a July-1 reference. Consumers should CALIBRATE/scale each group to a known recent CNI 16+ endpoint (e.g., CPS group population from data/cer-cohorts.json, or a BLS CNI control) before multiplying by trend LFP. The CNI/resident ratio is roughly stable within a group over this short horizon, so the scenario GROWTH and the immigration spread (high>baseline>low) carry over; only the level needs rescaling. Vintage note: this 2023 NPP predates the larger 2021-2024 immigration surge captured in Census Vintage 2025 and config/scenarios.config.ts; treat the level (and near-term growth) as conservative."
+  },
+  "byScenario": {
+    "baseline": [
+      {
+        "year": 2024,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20572
+      },
+      {
+        "year": 2024,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19681.6
+      },
+      {
+        "year": 2024,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23310.7
+      },
+      {
+        "year": 2024,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22403.8
+      },
+      {
+        "year": 2024,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 22595.5
+      },
+      {
+        "year": 2024,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22046.2
+      },
+      {
+        "year": 2024,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20213.2
+      },
+      {
+        "year": 2024,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20129.5
+      },
+      {
+        "year": 2024,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 20346.9
+      },
+      {
+        "year": 2024,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 21015.2
+      },
+      {
+        "year": 2024,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 27728.4
+      },
+      {
+        "year": 2024,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 33793.6
+      },
+      {
+        "year": 2025,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20445.4
+      },
+      {
+        "year": 2025,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19563.2
+      },
+      {
+        "year": 2025,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23401.5
+      },
+      {
+        "year": 2025,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22487.3
+      },
+      {
+        "year": 2025,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 22819.6
+      },
+      {
+        "year": 2025,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22279.8
+      },
+      {
+        "year": 2025,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20208.3
+      },
+      {
+        "year": 2025,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20137.2
+      },
+      {
+        "year": 2025,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 20254.5
+      },
+      {
+        "year": 2025,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 20889
+      },
+      {
+        "year": 2025,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 28595.1
+      },
+      {
+        "year": 2025,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 34731.5
+      },
+      {
+        "year": 2026,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20250.3
+      },
+      {
+        "year": 2026,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19356.1
+      },
+      {
+        "year": 2026,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23522.2
+      },
+      {
+        "year": 2026,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22623.4
+      },
+      {
+        "year": 2026,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23042.6
+      },
+      {
+        "year": 2026,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22507.8
+      },
+      {
+        "year": 2026,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20190.2
+      },
+      {
+        "year": 2026,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20129
+      },
+      {
+        "year": 2026,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 20170.3
+      },
+      {
+        "year": 2026,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 20767.7
+      },
+      {
+        "year": 2026,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 29442.9
+      },
+      {
+        "year": 2026,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 35663.7
+      },
+      {
+        "year": 2027,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20156.9
+      },
+      {
+        "year": 2027,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19236.9
+      },
+      {
+        "year": 2027,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23529.4
+      },
+      {
+        "year": 2027,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22661.4
+      },
+      {
+        "year": 2027,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23220.1
+      },
+      {
+        "year": 2027,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22680.5
+      },
+      {
+        "year": 2027,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20336.6
+      },
+      {
+        "year": 2027,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20272
+      },
+      {
+        "year": 2027,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 19966.2
+      },
+      {
+        "year": 2027,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 20541.8
+      },
+      {
+        "year": 2027,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 30244
+      },
+      {
+        "year": 2027,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 36554.9
+      },
+      {
+        "year": 2028,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20089
+      },
+      {
+        "year": 2028,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19178.9
+      },
+      {
+        "year": 2028,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23525.2
+      },
+      {
+        "year": 2028,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22672.9
+      },
+      {
+        "year": 2028,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23363.9
+      },
+      {
+        "year": 2028,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22807.4
+      },
+      {
+        "year": 2028,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20590.1
+      },
+      {
+        "year": 2028,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20512.1
+      },
+      {
+        "year": 2028,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 19685.2
+      },
+      {
+        "year": 2028,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 20245.8
+      },
+      {
+        "year": 2028,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 30986.7
+      },
+      {
+        "year": 2028,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 37396.1
+      },
+      {
+        "year": 2029,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 19994.5
+      },
+      {
+        "year": 2029,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19100.2
+      },
+      {
+        "year": 2029,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23569.2
+      },
+      {
+        "year": 2029,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22732.8
+      },
+      {
+        "year": 2029,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23520.5
+      },
+      {
+        "year": 2029,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22944.4
+      },
+      {
+        "year": 2029,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20842.2
+      },
+      {
+        "year": 2029,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20753.7
+      },
+      {
+        "year": 2029,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 19390
+      },
+      {
+        "year": 2029,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 19938.5
+      },
+      {
+        "year": 2029,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 31683.4
+      },
+      {
+        "year": 2029,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 38190.6
+      },
+      {
+        "year": 2030,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 19926.1
+      },
+      {
+        "year": 2030,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19036.5
+      },
+      {
+        "year": 2030,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23635.3
+      },
+      {
+        "year": 2030,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22814.3
+      },
+      {
+        "year": 2030,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23597.6
+      },
+      {
+        "year": 2030,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 23010
+      },
+      {
+        "year": 2030,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 21115.7
+      },
+      {
+        "year": 2030,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 21010
+      },
+      {
+        "year": 2030,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 19186.4
+      },
+      {
+        "year": 2030,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 19723.6
+      },
+      {
+        "year": 2030,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 32288.3
+      },
+      {
+        "year": 2030,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 38895.2
+      },
+      {
+        "year": 2031,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 19839.2
+      },
+      {
+        "year": 2031,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 18962.5
+      },
+      {
+        "year": 2031,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23746.5
+      },
+      {
+        "year": 2031,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22943.6
+      },
+      {
+        "year": 2031,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23650.9
+      },
+      {
+        "year": 2031,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 23053.3
+      },
+      {
+        "year": 2031,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 21421.8
+      },
+      {
+        "year": 2031,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 21294
+      },
+      {
+        "year": 2031,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 19033.9
+      },
+      {
+        "year": 2031,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 19577.3
+      },
+      {
+        "year": 2031,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 32785
+      },
+      {
+        "year": 2031,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 39476.3
+      },
+      {
+        "year": 2032,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 19697.1
+      },
+      {
+        "year": 2032,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 18836.4
+      },
+      {
+        "year": 2032,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23892.9
+      },
+      {
+        "year": 2032,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 23100
+      },
+      {
+        "year": 2032,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23716.2
+      },
+      {
+        "year": 2032,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 23106.3
+      },
+      {
+        "year": 2032,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 21666.2
+      },
+      {
+        "year": 2032,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 21517.3
+      },
+      {
+        "year": 2032,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 18978.7
+      },
+      {
+        "year": 2032,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 19532.8
+      },
+      {
+        "year": 2032,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 33214.1
+      },
+      {
+        "year": 2032,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 39988
+      }
+    ],
+    "high": [
+      {
+        "year": 2024,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20721.2
+      },
+      {
+        "year": 2024,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19822.3
+      },
+      {
+        "year": 2024,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23514.2
+      },
+      {
+        "year": 2024,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22602.5
+      },
+      {
+        "year": 2024,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 22717.1
+      },
+      {
+        "year": 2024,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22156.6
+      },
+      {
+        "year": 2024,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20274
+      },
+      {
+        "year": 2024,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20193.8
+      },
+      {
+        "year": 2024,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 20385.8
+      },
+      {
+        "year": 2024,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 21070.6
+      },
+      {
+        "year": 2024,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 27773.1
+      },
+      {
+        "year": 2024,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 33855.3
+      },
+      {
+        "year": 2025,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20656.6
+      },
+      {
+        "year": 2025,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19763
+      },
+      {
+        "year": 2025,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23706.1
+      },
+      {
+        "year": 2025,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22786.4
+      },
+      {
+        "year": 2025,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23007
+      },
+      {
+        "year": 2025,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22450.7
+      },
+      {
+        "year": 2025,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20301.8
+      },
+      {
+        "year": 2025,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20235
+      },
+      {
+        "year": 2025,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 20312.4
+      },
+      {
+        "year": 2025,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 20970.9
+      },
+      {
+        "year": 2025,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 28662.1
+      },
+      {
+        "year": 2025,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 34824.9
+      },
+      {
+        "year": 2026,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20515.8
+      },
+      {
+        "year": 2026,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19607.9
+      },
+      {
+        "year": 2026,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23926.3
+      },
+      {
+        "year": 2026,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 23022.3
+      },
+      {
+        "year": 2026,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23299
+      },
+      {
+        "year": 2026,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22742.8
+      },
+      {
+        "year": 2026,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20318
+      },
+      {
+        "year": 2026,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20261.6
+      },
+      {
+        "year": 2026,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 20247
+      },
+      {
+        "year": 2026,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 20875.6
+      },
+      {
+        "year": 2026,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 29532
+      },
+      {
+        "year": 2026,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 35789.2
+      },
+      {
+        "year": 2027,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20469.8
+      },
+      {
+        "year": 2027,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19534.6
+      },
+      {
+        "year": 2027,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 24030.5
+      },
+      {
+        "year": 2027,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 23158.3
+      },
+      {
+        "year": 2027,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23548.9
+      },
+      {
+        "year": 2027,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22983.3
+      },
+      {
+        "year": 2027,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20500.6
+      },
+      {
+        "year": 2027,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20440.8
+      },
+      {
+        "year": 2027,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 20061.9
+      },
+      {
+        "year": 2027,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 20675
+      },
+      {
+        "year": 2027,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 30355
+      },
+      {
+        "year": 2027,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 36712.7
+      },
+      {
+        "year": 2028,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20443.5
+      },
+      {
+        "year": 2028,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19517.2
+      },
+      {
+        "year": 2028,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 24120
+      },
+      {
+        "year": 2028,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 23265.3
+      },
+      {
+        "year": 2028,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23768.1
+      },
+      {
+        "year": 2028,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 23182
+      },
+      {
+        "year": 2028,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20792.2
+      },
+      {
+        "year": 2028,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20718.8
+      },
+      {
+        "year": 2028,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 19800.1
+      },
+      {
+        "year": 2028,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 20404.2
+      },
+      {
+        "year": 2028,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 31119.3
+      },
+      {
+        "year": 2028,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 37586.3
+      },
+      {
+        "year": 2029,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20386
+      },
+      {
+        "year": 2029,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19474.8
+      },
+      {
+        "year": 2029,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 24253.9
+      },
+      {
+        "year": 2029,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 23416.9
+      },
+      {
+        "year": 2029,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 24002.8
+      },
+      {
+        "year": 2029,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 23394.8
+      },
+      {
+        "year": 2029,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 21084.6
+      },
+      {
+        "year": 2029,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 21000.2
+      },
+      {
+        "year": 2029,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 19524.6
+      },
+      {
+        "year": 2029,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 20122
+      },
+      {
+        "year": 2029,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 31837.3
+      },
+      {
+        "year": 2029,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 38413.3
+      },
+      {
+        "year": 2030,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20351.2
+      },
+      {
+        "year": 2030,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19443.9
+      },
+      {
+        "year": 2030,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 24405.2
+      },
+      {
+        "year": 2030,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 23585.6
+      },
+      {
+        "year": 2030,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 24160.2
+      },
+      {
+        "year": 2030,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 23540.2
+      },
+      {
+        "year": 2030,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 21400.6
+      },
+      {
+        "year": 2030,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 21298.2
+      },
+      {
+        "year": 2030,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 19341.2
+      },
+      {
+        "year": 2030,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 19932.3
+      },
+      {
+        "year": 2030,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 32463.1
+      },
+      {
+        "year": 2030,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 39150.2
+      },
+      {
+        "year": 2031,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20295.8
+      },
+      {
+        "year": 2031,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19400.4
+      },
+      {
+        "year": 2031,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 24596.1
+      },
+      {
+        "year": 2031,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 23796.5
+      },
+      {
+        "year": 2031,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 24295.5
+      },
+      {
+        "year": 2031,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 23667
+      },
+      {
+        "year": 2031,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 21751.7
+      },
+      {
+        "year": 2031,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 21626
+      },
+      {
+        "year": 2031,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 19209.9
+      },
+      {
+        "year": 2031,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 19811.4
+      },
+      {
+        "year": 2031,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 32980.6
+      },
+      {
+        "year": 2031,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 39763.4
+      },
+      {
+        "year": 2032,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20184.3
+      },
+      {
+        "year": 2032,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19303.8
+      },
+      {
+        "year": 2032,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 24815.9
+      },
+      {
+        "year": 2032,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 24028.4
+      },
+      {
+        "year": 2032,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 24444.1
+      },
+      {
+        "year": 2032,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 23806.7
+      },
+      {
+        "year": 2032,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 22043.5
+      },
+      {
+        "year": 2032,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 21895.5
+      },
+      {
+        "year": 2032,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 19176.8
+      },
+      {
+        "year": 2032,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 19792.7
+      },
+      {
+        "year": 2032,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 33430
+      },
+      {
+        "year": 2032,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 40307
+      }
+    ],
+    "low": [
+      {
+        "year": 2024,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20472.5
+      },
+      {
+        "year": 2024,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19587.8
+      },
+      {
+        "year": 2024,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23174.9
+      },
+      {
+        "year": 2024,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22271.5
+      },
+      {
+        "year": 2024,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 22514.4
+      },
+      {
+        "year": 2024,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 21972.6
+      },
+      {
+        "year": 2024,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20172.8
+      },
+      {
+        "year": 2024,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20086.6
+      },
+      {
+        "year": 2024,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 20320.9
+      },
+      {
+        "year": 2024,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 20978.3
+      },
+      {
+        "year": 2024,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 27698.6
+      },
+      {
+        "year": 2024,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 33752.5
+      },
+      {
+        "year": 2025,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20304.6
+      },
+      {
+        "year": 2025,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19430.1
+      },
+      {
+        "year": 2025,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23198.4
+      },
+      {
+        "year": 2025,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22288
+      },
+      {
+        "year": 2025,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 22694.7
+      },
+      {
+        "year": 2025,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22166
+      },
+      {
+        "year": 2025,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20146
+      },
+      {
+        "year": 2025,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20072
+      },
+      {
+        "year": 2025,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 20215.9
+      },
+      {
+        "year": 2025,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 20834.3
+      },
+      {
+        "year": 2025,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 28550.5
+      },
+      {
+        "year": 2025,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 34669.3
+      },
+      {
+        "year": 2026,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 20073.4
+      },
+      {
+        "year": 2026,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19188.3
+      },
+      {
+        "year": 2026,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23252.8
+      },
+      {
+        "year": 2026,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22357.6
+      },
+      {
+        "year": 2026,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 22871.6
+      },
+      {
+        "year": 2026,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22351.2
+      },
+      {
+        "year": 2026,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20104.9
+      },
+      {
+        "year": 2026,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20040.7
+      },
+      {
+        "year": 2026,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 20119.1
+      },
+      {
+        "year": 2026,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 20695.8
+      },
+      {
+        "year": 2026,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 29383.5
+      },
+      {
+        "year": 2026,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 35580.1
+      },
+      {
+        "year": 2027,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 19948.3
+      },
+      {
+        "year": 2027,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 19038.4
+      },
+      {
+        "year": 2027,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23195.3
+      },
+      {
+        "year": 2027,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22330.3
+      },
+      {
+        "year": 2027,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23000.9
+      },
+      {
+        "year": 2027,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22478.7
+      },
+      {
+        "year": 2027,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20227.3
+      },
+      {
+        "year": 2027,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20159.5
+      },
+      {
+        "year": 2027,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 19902.4
+      },
+      {
+        "year": 2027,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 20452.9
+      },
+      {
+        "year": 2027,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 30170
+      },
+      {
+        "year": 2027,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 36449.7
+      },
+      {
+        "year": 2028,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 19852.6
+      },
+      {
+        "year": 2028,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 18953.3
+      },
+      {
+        "year": 2028,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23128.6
+      },
+      {
+        "year": 2028,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22278.2
+      },
+      {
+        "year": 2028,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23094.4
+      },
+      {
+        "year": 2028,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22557.7
+      },
+      {
+        "year": 2028,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20455.3
+      },
+      {
+        "year": 2028,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20374.3
+      },
+      {
+        "year": 2028,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 19608.5
+      },
+      {
+        "year": 2028,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 20140.1
+      },
+      {
+        "year": 2028,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 30898.3
+      },
+      {
+        "year": 2028,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 37269.3
+      },
+      {
+        "year": 2029,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 19733.5
+      },
+      {
+        "year": 2029,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 18850.5
+      },
+      {
+        "year": 2029,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23112.6
+      },
+      {
+        "year": 2029,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22277
+      },
+      {
+        "year": 2029,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23198.9
+      },
+      {
+        "year": 2029,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22644.2
+      },
+      {
+        "year": 2029,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20680.6
+      },
+      {
+        "year": 2029,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20589.4
+      },
+      {
+        "year": 2029,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 19300.2
+      },
+      {
+        "year": 2029,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 19816.1
+      },
+      {
+        "year": 2029,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 31580.8
+      },
+      {
+        "year": 2029,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 38042.2
+      },
+      {
+        "year": 2030,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 19642.7
+      },
+      {
+        "year": 2030,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 18764.9
+      },
+      {
+        "year": 2030,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23121.9
+      },
+      {
+        "year": 2030,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22300.3
+      },
+      {
+        "year": 2030,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23222.5
+      },
+      {
+        "year": 2030,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22656.6
+      },
+      {
+        "year": 2030,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 20925.7
+      },
+      {
+        "year": 2030,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 20817.8
+      },
+      {
+        "year": 2030,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 19083
+      },
+      {
+        "year": 2030,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 19584.4
+      },
+      {
+        "year": 2030,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 32171.7
+      },
+      {
+        "year": 2030,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 38725.3
+      },
+      {
+        "year": 2031,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 19534.8
+      },
+      {
+        "year": 2031,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 18670.5
+      },
+      {
+        "year": 2031,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23180
+      },
+      {
+        "year": 2031,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22375.3
+      },
+      {
+        "year": 2031,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23221
+      },
+      {
+        "year": 2031,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22644.2
+      },
+      {
+        "year": 2031,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 21201.8
+      },
+      {
+        "year": 2031,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 21072.6
+      },
+      {
+        "year": 2031,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 18916.5
+      },
+      {
+        "year": 2031,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 19421.1
+      },
+      {
+        "year": 2031,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 32654.6
+      },
+      {
+        "year": 2031,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 39285
+      },
+      {
+        "year": 2032,
+        "ageBand": "16-24",
+        "sex": "M",
+        "pop": 19372.4
+      },
+      {
+        "year": 2032,
+        "ageBand": "16-24",
+        "sex": "F",
+        "pop": 18524.8
+      },
+      {
+        "year": 2032,
+        "ageBand": "25-34",
+        "sex": "M",
+        "pop": 23277.4
+      },
+      {
+        "year": 2032,
+        "ageBand": "25-34",
+        "sex": "F",
+        "pop": 22481.4
+      },
+      {
+        "year": 2032,
+        "ageBand": "35-44",
+        "sex": "M",
+        "pop": 23230.8
+      },
+      {
+        "year": 2032,
+        "ageBand": "35-44",
+        "sex": "F",
+        "pop": 22639.5
+      },
+      {
+        "year": 2032,
+        "ageBand": "45-54",
+        "sex": "M",
+        "pop": 21414.7
+      },
+      {
+        "year": 2032,
+        "ageBand": "45-54",
+        "sex": "F",
+        "pop": 21265.2
+      },
+      {
+        "year": 2032,
+        "ageBand": "55-64",
+        "sex": "M",
+        "pop": 18846.6
+      },
+      {
+        "year": 2032,
+        "ageBand": "55-64",
+        "sex": "F",
+        "pop": 19359.5
+      },
+      {
+        "year": 2032,
+        "ageBand": "65+",
+        "sex": "M",
+        "pop": 33070.1
+      },
+      {
+        "year": 2032,
+        "ageBand": "65+",
+        "sex": "F",
+        "pop": 39775.4
+      }
+    ]
+  }
+}

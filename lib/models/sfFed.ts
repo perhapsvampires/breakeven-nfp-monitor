@@ -1,57 +1,48 @@
-// Model 5 — SF Fed breakeven (Nicolas Petrosky-Nadeau & Stephanie Stewart,
-// FRBSF Economic Letter 2024-18, July 2024). FULL methodology rebuild.
+// Model 5 — SF Fed breakeven (Petrosky-Nadeau & Stewart, FRBSF EL 2024-18).
 //
-// The paper extracts trend labor-force growth with a band-pass filter and sets
-//   breakeven employment growth = trend labor-force growth × (1 − u),  u = 3.8%
-// distinguishing a LONG-RUN trend (40-year+ horizon, structural ~70–90k) from a
-// SHORT-RUN trend (down to ~6-month horizons, cyclically elevated by the
-// 2022–24 immigration surge, peaking ~230k). It projects the labor force
-// forward under Census-baseline and CBO-high-immigration scenarios.
+// breakeven employment growth = trend labor-force growth × (1 − u), u = 3.8%,
+// with trends from a Christiano-Fitzgerald band-pass filter (short-run = periods
+// ≥ 18 months; long-run = 40-year horizon).
 //
-// Implementation here:
-//  1. CLF16OV (civilian labor force, 1948→present) from FRED.
-//  2. De-step the January CPS population-control level jumps (deStepJanuary) so
-//     the filtered short-run trend isn't spiked by control revisions.
-//  3. Project the labor force forward 24 months under two scenarios (baseline
-//     and high-immigration) by transitioning the monthly LF-growth pace from the
-//     latest smoothed pace to a scenario terminal pace.
-//  4. Christiano-Fitzgerald low-pass (cfLowPass): short-run trend = periods
-//     ≥ 18 months (smooth yet responsive; 12 oversamples to a sawtooth, 18
-//     matches the paper's ~270k 2023 peak), long-run = periods ≥ 480 months.
-//  5. breakeven = month-over-month growth of the trend level × (1 − u).
+// FORWARD PROJECTION (the paper's actual method, demographically grounded):
+// the labor force is projected as Σ_group projectedPopulation_g × trendLFP_g,
+// where trendLFP_g is the 24-month average participation rate by age×sex group
+// from CPS microdata (data/sf-lfp.json) and projectedPopulation_g comes from the
+// Census 2023 National Population Projections by age×sex under baseline vs
+// high-immigration scenarios (data/population-projections.json). Census gives
+// RESIDENT population; we form an LFP-weighted population index and normalize it
+// to the realized labor-force endpoint, so the resident→CNI level ratio cancels
+// and the projection splices onto realized CLF16OV continuously. Extending the
+// series forward also stabilizes the two-sided filter's recent endpoint.
 //
-// NOTE: realized values now run well below the July-2024 paper because net
-// immigration reversed after 2024 — the short-run trend has genuinely collapsed
-// toward/under the long-run. The forward projection (dashed in the UI) shows the
-// scenario spread. Long-run lands ~85–90k, at the top of the paper's 70–90k.
+// Realized history = de-stepped, COVID-interpolated CLF16OV (≡ the CPS aggregate).
 
 import { fetchFredSeries, observationsToMap } from '@/lib/fred'
-import { cfLowPass, deStepJanuary } from '@/lib/filters'
+import { cfLowPass, deStepJanuary, summarize } from '@/lib/filters'
 import { SERIES } from '@/config/series'
-import { summarize } from '@/lib/filters'
+import sfLfpData from '@/data/sf-lfp.json'
+import popProjData from '@/data/population-projections.json'
 import type { BreakevenPoint, ModelResult } from '@/types/economic'
 
-const U = 0.038 // long-run unemployment rate (paper)
-const SHORT_CUTOFF = 18 // months
-const LONG_CUTOFF = 480 // months (40 years)
-const PROJECT_MONTHS = 24
-const TRANSITION = 18 // months to reach scenario terminal pace
-const TERMINAL = { baseline: 80, high: 200 } // thousands/month LF growth
+const U = 0.038
+const SHORT_CUTOFF = 18
+const LONG_CUTOFF = 480
 const DEFAULT_DISPLAY_START = '2022-01-01'
+const DISPLAY_PROJ_MONTHS = 30 // months of projection to display past the data
 const CLF_START = '1948-01-01'
 const PAYEMS_START = '2021-06-01'
-// The 2020-21 COVID labor-force crash/rebound is a large transient that the
-// band-pass filter would "ring" off of (a spurious dip ~early 2022 then an
-// overshoot), distorting the short-run trend. Treat the pandemic months as an
-// outlier and linearly interpolate the labor-force level across them before
-// filtering — standard practice for trend extraction around COVID.
 const COVID_FROM = '2020-02-01'
 const COVID_TO = '2021-07-01'
 
+interface LfpGroup { id: string; trendLFP: number }
+interface PopRow { year: number; ageBand: string; sex: string; pop: number }
+const LFP_GROUPS = ((sfLfpData as { groups?: LfpGroup[] }).groups ?? [])
+const POP_BY_SCENARIO = ((popProjData as { byScenario?: Record<string, PopRow[]> }).byScenario ?? {})
+
 interface SfPoint extends BreakevenPoint {
-  shortRun: number | null // realized short-run (solid)
-  srBaseProj: number | null // baseline projection (dashed)
-  srHighProj: number | null // high-immigration projection (dashed)
+  shortRun: number | null
+  srBaseProj: number | null
+  srHighProj: number | null
   longRun: number | null
 }
 
@@ -61,7 +52,6 @@ function shiftMonths(date: string, delta: number): string {
   return `${Math.floor(idx / 12)}-${String((idx % 12) + 1).padStart(2, '0')}-01`
 }
 
-/** Linearly interpolate the COVID-period level between its endpoints. */
 function interpolateCovid(dates: string[], levels: number[]): number[] {
   const i0 = dates.indexOf(COVID_FROM)
   const i1 = dates.indexOf(COVID_TO)
@@ -74,14 +64,40 @@ function interpolateCovid(dates: string[], levels: number[]): number[] {
   return out
 }
 
-/** Month-over-month growth of a filtered level, scaled by (1 − u). */
 function trendBreakeven(levels: number[], cutoff: number): number[] {
   const f = cfLowPass(levels, cutoff)
   return f.map((v, i) => (i === 0 ? 0 : (v - f[i - 1]) * (1 - U)))
 }
 
-const EMPTY_SUMMARY = { latest: null, avg3: null, avg6: null, avg12: null }
+/** Annual LFP-weighted population index per scenario: Σ_g pop_g(year) × trendLFP_g. */
+function annualWeightedPop(scenario: string): Map<number, number> {
+  const lfp = new Map(LFP_GROUPS.map((g) => [g.id, g.trendLFP]))
+  const rows = POP_BY_SCENARIO[scenario] ?? []
+  const out = new Map<number, number>()
+  for (const r of rows) {
+    const rate = lfp.get(`${r.sex}-${r.ageBand}`)
+    if (rate == null) continue
+    out.set(r.year, (out.get(r.year) ?? 0) + r.pop * rate)
+  }
+  return out
+}
 
+/** Interpolate an annual (mid-year-anchored) series to a monthly date. */
+function interpAnnual(annual: Map<number, number>, date: string): number {
+  const years = [...annual.keys()].sort((a, b) => a - b)
+  const lo = years[0]
+  const hi = years[years.length - 1]
+  const [y, mo] = date.split('-').map(Number)
+  const x = y + (mo - 0.5) / 12
+  const clamped = Math.max(lo + 0.5, Math.min(hi + 0.5, x))
+  const a = Math.floor(clamped - 0.5)
+  const b = Math.min(a + 1, hi)
+  const wa = annual.get(a)!
+  const wb = annual.get(b)!
+  return b === a ? wa : wa + (wb - wa) * (clamped - (a + 0.5))
+}
+
+const EMPTY_SUMMARY = { latest: null, avg3: null, avg6: null, avg12: null }
 function emptyModelResult(error?: unknown): ModelResult {
   return {
     id: 'sf-fed',
@@ -102,93 +118,90 @@ export interface SfFedOptions {
 export async function computeSfFed(options: SfFedOptions = {}): Promise<ModelResult> {
   try {
     const displayStart = options.displayStart ?? DEFAULT_DISPLAY_START
+    if (LFP_GROUPS.length === 0 || Object.keys(POP_BY_SCENARIO).length === 0) {
+      return emptyModelResult('missing sf-lfp.json or population-projections.json')
+    }
 
     const [clfObs, payemsObs] = await Promise.all([
       fetchFredSeries(SERIES.CLF16OV, { startDate: CLF_START }),
       fetchFredSeries(SERIES.PAYEMS, { startDate: PAYEMS_START }),
     ])
-
     const clf = clfObs.filter((o) => o.value != null) as { date: string; value: number }[]
     if (clf.length < 120) return emptyModelResult('insufficient CLF16OV history')
     const payems = observationsToMap(payemsObs)
 
     const dates = clf.map((o) => o.date)
     const lastRealized = dates[dates.length - 1]
-    // De-step January control jumps, then interpolate the COVID transient.
     const deStepped = deStepJanuary(clf).adjusted
     const adjusted = interpolateCovid(dates, deStepped)
+    const realizedLast = adjusted[adjusted.length - 1]
 
-    // Latest smoothed LF-growth pace (g0) to anchor the forward projection.
-    const srTrend = cfLowPass(adjusted, SHORT_CUTOFF)
-    const g0 = srTrend[srTrend.length - 1] - srTrend[srTrend.length - 2]
+    // ---- Forward projection: Σ_g pop_g(scenario) × trendLFP_g, normalized so
+    // the projection equals the realized labor force at the splice point. ----
+    const annualBase = annualWeightedPop('baseline')
+    const annualHigh = annualWeightedPop('high')
+    const wBaseLast = interpAnnual(annualBase, lastRealized)
+    const wHighLast = interpAnnual(annualHigh, lastRealized)
 
-    // Forward projection of the LF level under a terminal growth pace.
-    function project(terminal: number): { levels: number[]; dates: string[] } {
-      const levels = adjusted.slice()
-      const ds = dates.slice()
-      let last = levels[levels.length - 1]
-      for (let k = 1; k <= PROJECT_MONTHS; k++) {
-        const g = g0 + (terminal - g0) * Math.min(k / TRANSITION, 1)
-        last += g
-        levels.push(last)
-        ds.push(shiftMonths(ds[ds.length - 1], 1))
-      }
-      return { levels, dates: ds }
+    const projDates: string[] = []
+    const lastProjYear = Math.max(...[...annualBase.keys()])
+    let d = shiftMonths(lastRealized, 1)
+    const projEnd = `${lastProjYear}-12-01`
+    while (d <= projEnd) {
+      projDates.push(d)
+      d = shiftMonths(d, 1)
     }
+    const projBase = projDates.map((dt) => (realizedLast * interpAnnual(annualBase, dt)) / wBaseLast)
+    const projHigh = projDates.map((dt) => (realizedLast * interpAnnual(annualHigh, dt)) / wHighLast)
 
-    const base = project(TERMINAL.baseline)
-    const high = project(TERMINAL.high)
-    const fullDates = base.dates // identical to high.dates
-    const srBase = trendBreakeven(base.levels, SHORT_CUTOFF)
-    const srHigh = trendBreakeven(high.levels, SHORT_CUTOFF)
-    const longRun = trendBreakeven(base.levels, LONG_CUTOFF)
+    const fullDates = dates.concat(projDates)
+    const srBase = trendBreakeven(adjusted.concat(projBase), SHORT_CUTOFF)
+    const srHigh = trendBreakeven(adjusted.concat(projHigh), SHORT_CUTOFF)
+    const longRun = trendBreakeven(adjusted.concat(projBase), LONG_CUTOFF)
 
-    const byDate = new Map(fullDates.map((d, i) => [d, i]))
+    const idxOf = new Map(fullDates.map((dt, i) => [dt, i]))
+    const displayEnd = shiftMonths(lastRealized, DISPLAY_PROJ_MONTHS)
 
     const points: SfPoint[] = []
     for (const date of fullDates) {
-      if (date < displayStart) continue
-      const i = byDate.get(date)!
+      if (date < displayStart || date > displayEnd) continue
+      const i = idxOf.get(date)!
       const realized = date <= lastRealized
       const nCur = payems.get(date)
       const nPrev = payems.get(shiftMonths(date, -1))
       const actualNfp = realized && nCur != null && nPrev != null ? nCur - nPrev : null
-
       const shortRun = realized ? srBase[i] : null
-      // Dashed projection lines connect at the boundary month, then fan out.
-      const inProjOrBoundary = date >= lastRealized
+      const inProj = date >= lastRealized
       points.push({
         date,
         actualNfp,
-        breakeven: shortRun, // for MetricsRow / gap (realized short-run)
+        breakeven: shortRun,
         gap: actualNfp != null && shortRun != null ? actualNfp - shortRun : null,
         shortRun,
-        srBaseProj: inProjOrBoundary ? srBase[i] : null,
-        srHighProj: inProjOrBoundary ? srHigh[i] : null,
+        srBaseProj: inProj ? srBase[i] : null,
+        srHighProj: inProj ? srHigh[i] : null,
         longRun: longRun[i],
       })
     }
 
-    const lastIdx = byDate.get(lastRealized)!
-    const latestShortRun = srBase[lastIdx]
-    const latestLongRun = longRun[lastIdx]
+    const lastIdx = idxOf.get(lastRealized)!
     const realizedPoints = points.filter((p) => p.date <= lastRealized)
     const lastWithActual = [...realizedPoints].reverse().find((p) => p.actualNfp != null)
 
     return {
       id: 'sf-fed',
       points: points as BreakevenPoint[],
-      latestBreakeven: latestShortRun,
+      latestBreakeven: srBase[lastIdx],
       latestActual: lastWithActual?.actualNfp ?? null,
       actualSummary: summarize(realizedPoints.map((p) => p.actualNfp)),
       breakevenSummary: summarize(realizedPoints.map((p) => p.breakeven)),
       computedAt: new Date().toISOString(),
       meta: {
         lastRealized,
-        latestShortRun,
-        latestLongRun,
+        latestShortRun: srBase[lastIdx],
+        latestLongRun: longRun[lastIdx],
         shortCutoff: SHORT_CUTOFF,
-        terminals: TERMINAL,
+        projectionSource: (popProjData as { meta?: unknown }).meta ?? null,
         u: U,
       },
     }
