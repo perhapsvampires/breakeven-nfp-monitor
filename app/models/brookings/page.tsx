@@ -1,5 +1,6 @@
 import {
   computeBrookings,
+  NATURAL_CHANGE_ANNUAL,
   PRE_PANDEMIC_RANGE,
 } from '@/lib/models/brookings'
 import { BreakevenChart } from '@/components/charts/BreakevenChart'
@@ -7,7 +8,7 @@ import { ModelCard } from '@/components/ModelCard'
 import { MetricsRow } from '@/components/MetricsRow'
 import { MethodologyNote } from '@/components/MethodologyNote'
 import { ScenarioToggle } from '@/components/ScenarioToggle'
-import { formatK, formatLongDate } from '@/lib/formatting'
+import { formatK, formatLongDate, formatMonthYear } from '@/lib/formatting'
 import {
   getScenario,
   type ImmigrationScenario,
@@ -61,6 +62,9 @@ export default async function BrookingsPage({
     (result.meta?.immigrationAdjustment as number | null) ?? null
   const annualNetImmigration =
     (result.meta?.annualNetImmigration as number | null) ?? null
+  const observedNetImmigrationAnnual =
+    (result.meta?.observedNetImmigrationAnnual as number | null) ?? null
+  const observedDate = (result.meta?.observedDate as string | null) ?? null
 
   const gap =
     result.latestActual != null && result.latestBreakeven != null
@@ -106,9 +110,9 @@ export default async function BrookingsPage({
           sub="Latest monthly print"
         />
         <ModelCard
-          label="Gap vs midpoint"
+          label="Gap vs breakeven"
           value={formatK(gap)}
-          sub={gap == null ? undefined : gap >= 0 ? 'Above range midpoint' : 'Below range midpoint'}
+          sub={gap == null ? undefined : gap >= 0 ? 'Above dynamic estimate' : 'Below dynamic estimate'}
           accent={gap == null ? 'neutral' : gap >= 0 ? 'positive' : 'negative'}
         />
       </div>
@@ -121,14 +125,14 @@ export default async function BrookingsPage({
           </span>
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-0.5 w-4 bg-chart-line" />
-            Breakeven midpoint ({scen.label})
+            Breakeven (dynamic, realized)
           </span>
           <span className="flex items-center gap-1.5">
             <span
               className="inline-block h-2.5 w-3 rounded-sm"
               style={{ background: 'rgba(22,163,74,0.18)' }}
             />
-            {scen.label} range
+            {scen.label} range (current)
           </span>
           <span className="flex items-center gap-1.5">
             <span
@@ -159,7 +163,34 @@ export default async function BrookingsPage({
         />
       </div>
 
+      <div className="rounded-lg border border-border bg-surface p-5 text-sm leading-relaxed text-secondary">
+        <p className="mb-1 text-xs font-medium uppercase tracking-widest text-tertiary">
+          Realized history
+        </p>
+        <p>
+          The blue line re-runs the formula above at every month using that
+          month&rsquo;s own net-immigration estimate, backed out from FRED
+          population data (POPTHM): 12-month population growth minus an
+          assumed {formatK(NATURAL_CHANGE_ANNUAL, false)}/year of natural
+          increase (births minus deaths).
+          {observedDate != null && observedNetImmigrationAnnual != null && (
+            <>
+              {' '}
+              As of {formatMonthYear(observedDate)}, realized net immigration
+              was approximately {formatK(observedNetImmigrationAnnual, false)}/year (
+              {formatK(observedNetImmigrationAnnual / 12, false)}/month).
+            </>
+          )}{' '}
+          The most recent month(s), where population data lag the payroll
+          release, use the selected scenario&rsquo;s immigration assumption
+          instead.
+        </p>
+      </div>
+
       <div className="rounded-lg border border-accent/20 bg-accent/5 p-5 text-sm leading-relaxed text-primary">
+        <p className="mb-1 text-xs font-medium uppercase tracking-widest text-accent">
+          Current scenario
+        </p>
         At {scen.label.toLowerCase()} immigration (
         {formatK(scen.monthlyNetImmigration)}/month net
         {annualNetImmigration != null && `, ${formatK(annualNetImmigration)}/year`}
@@ -195,14 +226,26 @@ export default async function BrookingsPage({
           labor-force participation rate ({Math.round(scen.newImmigrantLFPR * 100)}%).
         </p>
         <p>
-          Under the {scen.label.toLowerCase()} scenario ({formatK(scen.monthlyNetImmigration)}/month
+          The chart&rsquo;s blue line applies this shift dynamically: at each
+          month, net immigration is estimated from the 12-month change in
+          FRED POPTHM (total US population) minus an assumed{' '}
+          {formatK(NATURAL_CHANGE_ANNUAL, false)}/year natural increase, which
+          is then run through the same formula. This produces a realized
+          history that rises through the 2022&ndash;2024 immigration surge and
+          falls back toward (and below) the pre-pandemic baseline as
+          immigration cooled in 2025&ndash;2026.
+        </p>
+        <p>
+          The green band shows the <strong>current</strong> scenario instead:
+          under the {scen.label.toLowerCase()} assumption ({formatK(scen.monthlyNetImmigration)}/month
           {annualNetImmigration != null && `, ${formatK(annualNetImmigration)}/year`} net
           immigration), the adjustment is {formatK(immigrationAdjustment, false)}/month, putting
           the breakeven range at {rangeLabel} &mdash; {belowBaseline ? 'below' : 'above'} the
-          pre-pandemic baseline. This is the inverse of the paper&rsquo;s 2024
-          finding, where the post-2022 immigration surge pushed potential
-          employment growth above its pre-pandemic range; the scenario toggle
-          shows how the range moves as the immigration assumption changes.
+          pre-pandemic baseline. This same scenario value fills in the
+          dynamic line&rsquo;s most recent month(s), where Census population
+          data hasn&rsquo;t yet caught up to the payroll release; the toggle
+          shows how that near-term estimate moves as the immigration
+          assumption changes.
         </p>
       </MethodologyNote>
     </div>
