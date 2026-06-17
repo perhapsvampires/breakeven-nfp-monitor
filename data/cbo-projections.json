@@ -1,0 +1,633 @@
+{
+  "meta": {
+    "source": "CBO Budget and Economic Outlook, February 2026",
+    "publication": "https://www.cbo.gov/publication/61882",
+    "dataZip": "https://www.cbo.gov/system/files/2026-02/55022-2026-02-Historical-Economic-Data.zip",
+    "vintage": "2026-02",
+    "units": {
+      "potentialLFPR": "percent",
+      "nrou": "percent",
+      "potentialLFMillions": "millions of people",
+      "popCiv16Millions": "millions of people, civilian noninstitutional 16+"
+    },
+    "generatedAt": "2026-06-17T02:24:24.051Z"
+  },
+  "quarterly": [
+    {
+      "date": "2015Q1",
+      "potentialLFPR": 63.4508,
+      "nrou": 4.7457,
+      "potentialLFMillions": 158.5799,
+      "popCiv16Millions": 249.9325
+    },
+    {
+      "date": "2015Q2",
+      "potentialLFPR": 63.3986,
+      "nrou": 4.7248,
+      "potentialLFMillions": 158.8426,
+      "popCiv16Millions": 250.5353
+    },
+    {
+      "date": "2015Q3",
+      "potentialLFPR": 63.3479,
+      "nrou": 4.7041,
+      "potentialLFMillions": 159.1093,
+      "popCiv16Millions": 251.148
+    },
+    {
+      "date": "2015Q4",
+      "potentialLFPR": 63.3005,
+      "nrou": 4.6837,
+      "potentialLFMillions": 159.3845,
+      "popCiv16Millions": 251.7643
+    },
+    {
+      "date": "2016Q1",
+      "potentialLFPR": 63.2572,
+      "nrou": 4.6637,
+      "potentialLFMillions": 159.669,
+      "popCiv16Millions": 252.4024
+    },
+    {
+      "date": "2016Q2",
+      "potentialLFPR": 63.2139,
+      "nrou": 4.6443,
+      "potentialLFMillions": 159.9496,
+      "popCiv16Millions": 253.0432
+    },
+    {
+      "date": "2016Q3",
+      "potentialLFPR": 63.1706,
+      "nrou": 4.6256,
+      "potentialLFMillions": 160.2224,
+      "popCiv16Millions": 253.6486
+    },
+    {
+      "date": "2016Q4",
+      "potentialLFPR": 63.1288,
+      "nrou": 4.6076,
+      "potentialLFMillions": 160.4882,
+      "popCiv16Millions": 254.2353
+    },
+    {
+      "date": "2017Q1",
+      "potentialLFPR": 63.0892,
+      "nrou": 4.5904,
+      "potentialLFMillions": 160.7472,
+      "popCiv16Millions": 254.8093
+    },
+    {
+      "date": "2017Q2",
+      "potentialLFPR": 63.0489,
+      "nrou": 4.5742,
+      "potentialLFMillions": 160.9909,
+      "popCiv16Millions": 255.3635
+    },
+    {
+      "date": "2017Q3",
+      "potentialLFPR": 63.0082,
+      "nrou": 4.5589,
+      "potentialLFMillions": 161.2201,
+      "popCiv16Millions": 255.8943
+    },
+    {
+      "date": "2017Q4",
+      "potentialLFPR": 62.9684,
+      "nrou": 4.5447,
+      "potentialLFMillions": 161.439,
+      "popCiv16Millions": 256.3928
+    },
+    {
+      "date": "2018Q1",
+      "potentialLFPR": 62.9308,
+      "nrou": 4.5315,
+      "potentialLFMillions": 161.6535,
+      "popCiv16Millions": 256.8535
+    },
+    {
+      "date": "2018Q2",
+      "potentialLFPR": 62.8939,
+      "nrou": 4.5194,
+      "potentialLFMillions": 161.8632,
+      "popCiv16Millions": 257.3318
+    },
+    {
+      "date": "2018Q3",
+      "potentialLFPR": 62.859,
+      "nrou": 4.5084,
+      "potentialLFMillions": 162.0735,
+      "popCiv16Millions": 257.8283
+    },
+    {
+      "date": "2018Q4",
+      "potentialLFPR": 62.8282,
+      "nrou": 4.4984,
+      "potentialLFMillions": 162.2903,
+      "popCiv16Millions": 258.3187
+    },
+    {
+      "date": "2019Q1",
+      "potentialLFPR": 62.803,
+      "nrou": 4.4895,
+      "potentialLFMillions": 162.5167,
+      "popCiv16Millions": 258.7452
+    },
+    {
+      "date": "2019Q2",
+      "potentialLFPR": 62.7807,
+      "nrou": 4.4816,
+      "potentialLFMillions": 162.7466,
+      "popCiv16Millions": 259.1845
+    },
+    {
+      "date": "2019Q3",
+      "potentialLFPR": 62.762,
+      "nrou": 4.4747,
+      "potentialLFMillions": 162.9803,
+      "popCiv16Millions": 259.6805
+    },
+    {
+      "date": "2019Q4",
+      "potentialLFPR": 62.7483,
+      "nrou": 4.4687,
+      "potentialLFMillions": 163.2171,
+      "popCiv16Millions": 260.194
+    },
+    {
+      "date": "2020Q1",
+      "potentialLFPR": 62.7367,
+      "nrou": 4.4635,
+      "potentialLFMillions": 163.4465,
+      "popCiv16Millions": 260.6163
+    },
+    {
+      "date": "2020Q2",
+      "potentialLFPR": 62.7168,
+      "nrou": 4.459,
+      "potentialLFMillions": 163.6416,
+      "popCiv16Millions": 260.9612
+    },
+    {
+      "date": "2020Q3",
+      "potentialLFPR": 62.6854,
+      "nrou": 4.4553,
+      "potentialLFMillions": 163.7999,
+      "popCiv16Millions": 261.3005
+    },
+    {
+      "date": "2020Q4",
+      "potentialLFPR": 62.6552,
+      "nrou": 4.4521,
+      "potentialLFMillions": 163.9628,
+      "popCiv16Millions": 261.6616
+    },
+    {
+      "date": "2021Q1",
+      "potentialLFPR": 62.6293,
+      "nrou": 4.4529,
+      "potentialLFMillions": 164.1492,
+      "popCiv16Millions": 262.1031
+    },
+    {
+      "date": "2021Q2",
+      "potentialLFPR": 62.6072,
+      "nrou": 4.4498,
+      "potentialLFMillions": 164.3645,
+      "popCiv16Millions": 262.5541
+    },
+    {
+      "date": "2021Q3",
+      "potentialLFPR": 62.5887,
+      "nrou": 4.447,
+      "potentialLFMillions": 164.6133,
+      "popCiv16Millions": 262.9948
+    },
+    {
+      "date": "2021Q4",
+      "potentialLFPR": 62.5733,
+      "nrou": 4.4444,
+      "potentialLFMillions": 164.9026,
+      "popCiv16Millions": 263.4295
+    },
+    {
+      "date": "2022Q1",
+      "potentialLFPR": 62.5607,
+      "nrou": 4.4419,
+      "potentialLFMillions": 165.243,
+      "popCiv16Millions": 264.1165
+    },
+    {
+      "date": "2022Q2",
+      "potentialLFPR": 62.5504,
+      "nrou": 4.4405,
+      "potentialLFMillions": 165.6334,
+      "popCiv16Millions": 264.8093
+    },
+    {
+      "date": "2022Q3",
+      "potentialLFPR": 62.5422,
+      "nrou": 4.4389,
+      "potentialLFMillions": 166.0713,
+      "popCiv16Millions": 265.5024
+    },
+    {
+      "date": "2022Q4",
+      "potentialLFPR": 62.5357,
+      "nrou": 4.4372,
+      "potentialLFMillions": 166.5547,
+      "popCiv16Millions": 266.1875
+    },
+    {
+      "date": "2023Q1",
+      "potentialLFPR": 62.5305,
+      "nrou": 4.4353,
+      "potentialLFMillions": 167.0866,
+      "popCiv16Millions": 267.1578
+    },
+    {
+      "date": "2023Q2",
+      "potentialLFPR": 62.5261,
+      "nrou": 4.4335,
+      "potentialLFMillions": 167.6543,
+      "popCiv16Millions": 268.1288
+    },
+    {
+      "date": "2023Q3",
+      "potentialLFPR": 62.5224,
+      "nrou": 4.4314,
+      "potentialLFMillions": 168.2407,
+      "popCiv16Millions": 269.1046
+    },
+    {
+      "date": "2023Q4",
+      "potentialLFPR": 62.5188,
+      "nrou": 4.4288,
+      "potentialLFMillions": 168.8288,
+      "popCiv16Millions": 270.0751
+    },
+    {
+      "date": "2024Q1",
+      "potentialLFPR": 62.515,
+      "nrou": 4.4257,
+      "potentialLFMillions": 169.4105,
+      "popCiv16Millions": 270.9927
+    },
+    {
+      "date": "2024Q2",
+      "potentialLFPR": 62.5106,
+      "nrou": 4.4222,
+      "potentialLFMillions": 169.9724,
+      "popCiv16Millions": 271.9067
+    },
+    {
+      "date": "2024Q3",
+      "potentialLFPR": 62.5054,
+      "nrou": 4.4182,
+      "potentialLFMillions": 170.4996,
+      "popCiv16Millions": 272.8229
+    },
+    {
+      "date": "2024Q4",
+      "potentialLFPR": 62.4988,
+      "nrou": 4.4137,
+      "potentialLFMillions": 170.9771,
+      "popCiv16Millions": 273.7355
+    },
+    {
+      "date": "2025Q1",
+      "potentialLFPR": 62.4905,
+      "nrou": 4.409,
+      "potentialLFMillions": 171.4028,
+      "popCiv16Millions": 274.332
+    },
+    {
+      "date": "2025Q2",
+      "potentialLFPR": 62.4788,
+      "nrou": 4.4069,
+      "potentialLFMillions": 171.772,
+      "popCiv16Millions": 274.933
+    },
+    {
+      "date": "2025Q3",
+      "potentialLFPR": 62.4597,
+      "nrou": 4.4042,
+      "potentialLFMillions": 172.0758,
+      "popCiv16Millions": 275.5001
+    },
+    {
+      "date": "2025Q4",
+      "potentialLFPR": 62.4399,
+      "nrou": 4.4018,
+      "potentialLFMillions": 172.3355,
+      "popCiv16Millions": 276.0776
+    },
+    {
+      "date": "2026Q1",
+      "potentialLFPR": 62.4217,
+      "nrou": 4.3991,
+      "potentialLFMillions": 172.5645,
+      "popCiv16Millions": 276.455
+    },
+    {
+      "date": "2026Q2",
+      "potentialLFPR": 62.4038,
+      "nrou": 4.3959,
+      "potentialLFMillions": 172.7671,
+      "popCiv16Millions": 276.8321
+    },
+    {
+      "date": "2026Q3",
+      "potentialLFPR": 62.3862,
+      "nrou": 4.3924,
+      "potentialLFMillions": 172.9539,
+      "popCiv16Millions": 277.1932
+    },
+    {
+      "date": "2026Q4",
+      "potentialLFPR": 62.3695,
+      "nrou": 4.3884,
+      "potentialLFMillions": 173.1328,
+      "popCiv16Millions": 277.558
+    },
+    {
+      "date": "2027Q1",
+      "potentialLFPR": 62.3539,
+      "nrou": 4.3841,
+      "potentialLFMillions": 173.31,
+      "popCiv16Millions": 277.9228
+    },
+    {
+      "date": "2027Q2",
+      "potentialLFPR": 62.3392,
+      "nrou": 4.3795,
+      "potentialLFMillions": 173.4885,
+      "popCiv16Millions": 278.2874
+    },
+    {
+      "date": "2027Q3",
+      "potentialLFPR": 62.3246,
+      "nrou": 4.3745,
+      "potentialLFMillions": 173.6691,
+      "popCiv16Millions": 278.6421
+    },
+    {
+      "date": "2027Q4",
+      "potentialLFPR": 62.3097,
+      "nrou": 4.3692,
+      "potentialLFMillions": 173.8506,
+      "popCiv16Millions": 279
+    },
+    {
+      "date": "2028Q1",
+      "potentialLFPR": 62.2945,
+      "nrou": 4.3636,
+      "potentialLFMillions": 174.0339,
+      "popCiv16Millions": 279.3719
+    },
+    {
+      "date": "2028Q2",
+      "potentialLFPR": 62.2793,
+      "nrou": 4.3578,
+      "potentialLFMillions": 174.2202,
+      "popCiv16Millions": 279.745
+    },
+    {
+      "date": "2028Q3",
+      "potentialLFPR": 62.2634,
+      "nrou": 4.3517,
+      "potentialLFMillions": 174.4075,
+      "popCiv16Millions": 280.1137
+    },
+    {
+      "date": "2028Q4",
+      "potentialLFPR": 62.246,
+      "nrou": 4.3454,
+      "potentialLFMillions": 174.5939,
+      "popCiv16Millions": 280.484
+    },
+    {
+      "date": "2029Q1",
+      "potentialLFPR": 62.226,
+      "nrou": 4.3389,
+      "potentialLFMillions": 174.7757,
+      "popCiv16Millions": 280.8726
+    },
+    {
+      "date": "2029Q2",
+      "potentialLFPR": 62.2041,
+      "nrou": 4.3322,
+      "potentialLFMillions": 174.9554,
+      "popCiv16Millions": 281.2621
+    },
+    {
+      "date": "2029Q3",
+      "potentialLFPR": 62.1823,
+      "nrou": 4.3255,
+      "potentialLFMillions": 175.1393,
+      "popCiv16Millions": 281.6509
+    },
+    {
+      "date": "2029Q4",
+      "potentialLFPR": 62.163,
+      "nrou": 4.3187,
+      "potentialLFMillions": 175.3331,
+      "popCiv16Millions": 282.0385
+    },
+    {
+      "date": "2030Q1",
+      "potentialLFPR": 62.1469,
+      "nrou": 4.3118,
+      "potentialLFMillions": 175.5391,
+      "popCiv16Millions": 282.4528
+    },
+    {
+      "date": "2030Q2",
+      "potentialLFPR": 62.133,
+      "nrou": 4.3049,
+      "potentialLFMillions": 175.7529,
+      "popCiv16Millions": 282.8665
+    },
+    {
+      "date": "2030Q3",
+      "potentialLFPR": 62.1199,
+      "nrou": 4.2983,
+      "potentialLFMillions": 175.9701,
+      "popCiv16Millions": 283.2792
+    },
+    {
+      "date": "2030Q4",
+      "potentialLFPR": 62.1065,
+      "nrou": 4.2918,
+      "potentialLFMillions": 176.1854,
+      "popCiv16Millions": 283.6881
+    },
+    {
+      "date": "2031Q1",
+      "potentialLFPR": 62.0924,
+      "nrou": 4.2857,
+      "potentialLFMillions": 176.3964,
+      "popCiv16Millions": 284.0896
+    },
+    {
+      "date": "2031Q2",
+      "potentialLFPR": 62.0783,
+      "nrou": 4.2797,
+      "potentialLFMillions": 176.6047,
+      "popCiv16Millions": 284.4883
+    },
+    {
+      "date": "2031Q3",
+      "potentialLFPR": 62.0644,
+      "nrou": 4.274,
+      "potentialLFMillions": 176.8103,
+      "popCiv16Millions": 284.8836
+    },
+    {
+      "date": "2031Q4",
+      "potentialLFPR": 62.0508,
+      "nrou": 4.2685,
+      "potentialLFMillions": 177.0128,
+      "popCiv16Millions": 285.2737
+    },
+    {
+      "date": "2032Q1",
+      "potentialLFPR": 62.0371,
+      "nrou": 4.2632,
+      "potentialLFMillions": 177.2101,
+      "popCiv16Millions": 285.6512
+    },
+    {
+      "date": "2032Q2",
+      "potentialLFPR": 62.0235,
+      "nrou": 4.258,
+      "potentialLFMillions": 177.4026,
+      "popCiv16Millions": 286.024
+    },
+    {
+      "date": "2032Q3",
+      "potentialLFPR": 62.0107,
+      "nrou": 4.2529,
+      "potentialLFMillions": 177.5926,
+      "popCiv16Millions": 286.391
+    },
+    {
+      "date": "2032Q4",
+      "potentialLFPR": 61.9996,
+      "nrou": 4.2479,
+      "potentialLFMillions": 177.782,
+      "popCiv16Millions": 286.7524
+    },
+    {
+      "date": "2033Q1",
+      "potentialLFPR": 61.9902,
+      "nrou": 4.2429,
+      "potentialLFMillions": 177.9699,
+      "popCiv16Millions": 287.0941
+    },
+    {
+      "date": "2033Q2",
+      "potentialLFPR": 61.9823,
+      "nrou": 4.2378,
+      "potentialLFMillions": 178.156,
+      "popCiv16Millions": 287.4303
+    },
+    {
+      "date": "2033Q3",
+      "potentialLFPR": 61.9758,
+      "nrou": 4.2328,
+      "potentialLFMillions": 178.3406,
+      "popCiv16Millions": 287.7593
+    },
+    {
+      "date": "2033Q4",
+      "potentialLFPR": 61.9708,
+      "nrou": 4.2276,
+      "potentialLFMillions": 178.5236,
+      "popCiv16Millions": 288.0826
+    },
+    {
+      "date": "2034Q1",
+      "potentialLFPR": 61.9676,
+      "nrou": 4.2224,
+      "potentialLFMillions": 178.7054,
+      "popCiv16Millions": 288.3862
+    },
+    {
+      "date": "2034Q2",
+      "potentialLFPR": 61.9661,
+      "nrou": 4.2172,
+      "potentialLFMillions": 178.8865,
+      "popCiv16Millions": 288.6836
+    },
+    {
+      "date": "2034Q3",
+      "potentialLFPR": 61.9657,
+      "nrou": 4.2119,
+      "potentialLFMillions": 179.0665,
+      "popCiv16Millions": 288.9739
+    },
+    {
+      "date": "2034Q4",
+      "potentialLFPR": 61.966,
+      "nrou": 4.2065,
+      "potentialLFMillions": 179.2438,
+      "popCiv16Millions": 289.2585
+    },
+    {
+      "date": "2035Q1",
+      "potentialLFPR": 61.9669,
+      "nrou": 4.201,
+      "potentialLFMillions": 179.4184,
+      "popCiv16Millions": 289.5373
+    },
+    {
+      "date": "2035Q2",
+      "potentialLFPR": 61.9687,
+      "nrou": 4.1956,
+      "potentialLFMillions": 179.5915,
+      "popCiv16Millions": 289.8098
+    },
+    {
+      "date": "2035Q3",
+      "potentialLFPR": 61.9712,
+      "nrou": 4.1902,
+      "potentialLFMillions": 179.7628,
+      "popCiv16Millions": 290.076
+    },
+    {
+      "date": "2035Q4",
+      "potentialLFPR": 61.9741,
+      "nrou": 4.1849,
+      "potentialLFMillions": 179.9314,
+      "popCiv16Millions": 290.3366
+    },
+    {
+      "date": "2036Q1",
+      "potentialLFPR": 61.9775,
+      "nrou": 4.1795,
+      "potentialLFMillions": 180.0966,
+      "popCiv16Millions": 290.5864
+    },
+    {
+      "date": "2036Q2",
+      "potentialLFPR": 61.9815,
+      "nrou": 4.1743,
+      "potentialLFMillions": 180.2595,
+      "popCiv16Millions": 290.8296
+    },
+    {
+      "date": "2036Q3",
+      "potentialLFPR": 61.9859,
+      "nrou": 4.1691,
+      "potentialLFMillions": 180.4206,
+      "popCiv16Millions": 291.0678
+    },
+    {
+      "date": "2036Q4",
+      "potentialLFPR": 61.9909,
+      "nrou": 4.1639,
+      "potentialLFMillions": 180.58,
+      "popCiv16Millions": 291.3013
+    }
+  ]
+}
