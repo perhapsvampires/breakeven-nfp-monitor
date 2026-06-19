@@ -29,10 +29,10 @@
 // The scenario variation in population growth is visible in the chart as the
 // immigration surge (2022-2024) raises the breakeven, then its reversal
 // (2025-2026) brings it back toward (and below) the pre-pandemic baseline.
-
+//
 import { fetchFredSeries, observationsToMap } from '@/lib/fred'
 import { SERIES } from '@/config/series'
-import { summarize } from '@/lib/filters'
+import { summarize, movingAverage } from '@/lib/filters'
 import type { BreakevenPoint, ModelResult } from '@/types/economic'
 
 const DEFAULT_DISPLAY_START = '2020-01-01'
@@ -216,15 +216,30 @@ export async function computeFrbsf2016(
       latestNrou = nrou
     }
 
-    const lastWithActual = [...points].reverse().find((p) => p.actualNfp != null)
+    // The 12-month smoothed population formula holds each annual CPS control
+    // revision in the estimate for a full year, creating a "staircase" that is
+    // structurally correct but visually misleading on a monthly chart. A 3-month
+    // trailing average softens regime transitions without altering the underlying
+    // demographic calculation.
+    const smoothedBreakeven = movingAverage(points.map((p) => p.breakeven), 3)
+    const smoothedPoints = points.map((p, i) => {
+      const bk: number | null = smoothedBreakeven[i] ?? p.breakeven
+      return {
+        ...p,
+        breakeven: bk,
+        gap: p.actualNfp != null && bk != null ? p.actualNfp - bk : null,
+      }
+    })
+
+    const lastWithActual = [...smoothedPoints].reverse().find((p) => p.actualNfp != null)
 
     return {
       id: 'frbsf-2016',
-      points,
+      points: smoothedPoints,
       latestBreakeven: lastWithActual?.breakeven ?? null,
       latestActual: lastWithActual?.actualNfp ?? null,
-      actualSummary: summarize(points.map((p) => p.actualNfp)),
-      breakevenSummary: summarize(points.map((p) => p.breakeven)),
+      actualSummary: summarize(smoothedPoints.map((p) => p.actualNfp)),
+      breakevenSummary: summarize(smoothedPoints.map((p) => p.breakeven)),
       computedAt: new Date().toISOString(),
       meta: {
         latestNrou,
