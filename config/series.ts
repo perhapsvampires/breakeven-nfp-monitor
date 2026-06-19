@@ -19,6 +19,18 @@ export const SERIES = {
   EMRATIO: 'EMRATIO', // Employment-population ratio (overall), SA, %
   POPTHM: 'POPTHM', // Total U.S. resident population, monthly, thousands
 
+  // Age-group LFPR — Seasonally Adjusted (FRBSF 2016 model)
+  LFPR_16_19: 'LNS11300012', // LFPR 16–19 yrs, SA, %
+  LFPR_20_24: 'LNS11300036', // LFPR 20–24 yrs, SA, %
+  LFPR_25_54: 'LNS11300060', // LFPR 25–54 yrs, SA, %
+  LFPR_55_PLUS: 'LNS11324230', // LFPR 55+ yrs, SA, %
+
+  // Age-group population — Not Seasonally Adjusted (CPS, monthly, thousands)
+  POP_16_19: 'LNU00000012',
+  POP_20_24: 'LNU00000036',
+  POP_25_54: 'LNU00000060',
+  POP_55_PLUS: 'LNU00024230',
+
   // Structural
   NROU: 'NROU', // Noncyclical rate of unemployment (CBO), quarterly, %
 } as const
