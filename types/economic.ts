@@ -64,3 +64,24 @@ export interface CerDecomposition {
   /** Resulting CER breakeven. */
   gCer: number
 }
+
+/** Serializable payload sent from the AI Summary page to /api/summary. */
+export interface SummaryPayload {
+  computedAt: string
+  latestNfpDate: string
+  models: {
+    cer: number | null
+    stl: number | null
+    frbsf: number | null
+    brookings: { low: number | null; base: number | null; high: number | null }
+    sfFed: { shortRun: number | null; longRun: number | null }
+    fedBoard: number | null
+    dallas: { low: number | null; base: number | null; high: number | null }
+  }
+  actualNfp: {
+    latest: number | null
+    avg3: number | null
+    avg6: number | null
+    avg12: number | null
+  }
+}
