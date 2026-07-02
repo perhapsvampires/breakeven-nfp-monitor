@@ -130,31 +130,41 @@ export async function computeEmployAmericaCER(
 
   const points: BreakevenPoint[] = []
   let latestDecomp: CerDecomposition | null = null
+  // Carry-forward: when CPS microdata for the latest month isn't published yet,
+  // eprChange returns null. We reuse the last known value so that new PAYEMS
+  // prints still produce a breakeven estimate rather than a gap in the chart.
+  let lastValidGEpr: number | null = null
 
   for (const date of months) {
-    if (date < displayStart) continue
-
     const base = shiftMonths(date, -WINDOW)
-    const prev = shiftMonths(date, -1)
 
     const nCur = payems.get(date)
     const nBase = payems.get(base)
-    const nPrev = payems.get(prev)
 
+    // Always compute gEpr (even pre-displayStart) to keep the carry-forward current.
+    let gEpr: number | null = null
+    if (nCur != null && nBase != null && nBase > 0) {
+      gEpr = eprChange(date, base)
+      if (gEpr != null) lastValidGEpr = gEpr
+    }
+
+    if (date < displayStart) continue
+
+    const prev = shiftMonths(date, -1)
+    const nPrev = payems.get(prev)
     const actualNfp = nCur != null && nPrev != null ? nCur - nPrev : null
 
     let breakeven: number | null = null
     if (nCur != null && nBase != null && nBase > 0) {
-      const gEpr = eprChange(date, base)
-      if (gEpr != null) {
+      const effectiveGEpr = gEpr ?? lastValidGEpr
+      if (effectiveGEpr != null) {
         const gN = Math.log(nCur / nBase)
-        const gAdj = 0
-        const gCer = gN - gEpr - gAdj
+        const gCer = gN - effectiveGEpr
         breakeven = (gCer * nCur) / WINDOW
         latestDecomp = {
           gN: (gN * nCur) / WINDOW,
-          gEpr: (gEpr * nCur) / WINDOW,
-          gAdj: (gAdj * nCur) / WINDOW,
+          gEpr: (effectiveGEpr * nCur) / WINDOW,
+          gAdj: 0,
           gCer: breakeven,
         }
       }

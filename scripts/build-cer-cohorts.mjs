@@ -10,12 +10,21 @@
 // Recodes validated against BLS (Jan 2025): employed 162.4M vs ~161.4M,
 // foreign-born employed 31.7M vs ~32M.
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const KEY = readFileSync(join(ROOT, 'census_api_key.txt'), 'utf8').trim()
+
+function getCensusKey() {
+  if (process.env.CENSUS_API_KEY) return process.env.CENSUS_API_KEY
+  const keyPath = join(ROOT, 'census_api_key.txt')
+  if (existsSync(keyPath)) return readFileSync(keyPath, 'utf8').trim()
+  throw new Error(
+    'Census API key not found: set CENSUS_API_KEY env var or create census_api_key.txt',
+  )
+}
+const KEY = getCensusKey()
 
 const START_YEAR = 2018
 const END_YEAR = 2026
