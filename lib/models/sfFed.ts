@@ -1,8 +1,17 @@
 // Model 5 — SF Fed breakeven (Petrosky-Nadeau & Stewart, FRBSF EL 2024-18).
 //
-// breakeven employment growth = trend labor-force growth × (1 − u), u = 3.8%,
-// with trends from a Christiano-Fitzgerald band-pass filter (short-run = periods
-// ≥ 18 months; long-run = 40-year horizon).
+// dNbe = (1 − ū) × dLFtrend, ū = 4.4% (U.S. reference unemployment rate)
+// Trend labor force extracted with a Christiano-Fitzgerald asymmetric
+// band-pass filter:
+//   Long-run:  passes 2–480 month cycles (≈ 40-year horizon)
+//   Short-run: passes 2–72 month cycles; captures multi-year immigration cycles
+//
+// Both filters run on CLF16OV (history) spliced with a Census-based demographic
+// projection (forward), which stabilizes filter endpoint drift. The short-run
+// filter is also sensitive to the COVID break; the linear interpolation through
+// 2020-02–2021-07 is a reasonable substitute for the author's separate pre/post
+// filter approach, since the 72-month passband naturally attenuates the 17-month
+// disruption.
 //
 // FORWARD PROJECTION (the paper's actual method, demographically grounded):
 // the labor force is projected as Σ_group projectedPopulation_g × trendLFP_g,
@@ -24,8 +33,8 @@ import sfLfpData from '@/data/sf-lfp.json'
 import popProjData from '@/data/population-projections.json'
 import type { BreakevenPoint, ModelResult } from '@/types/economic'
 
-const U = 0.038
-const SHORT_CUTOFF = 18
+const U = 0.044
+const SHORT_CUTOFF = 72
 const LONG_CUTOFF = 480
 const DEFAULT_DISPLAY_START = '2022-01-01'
 const DISPLAY_PROJ_MONTHS = 30 // months of projection to display past the data

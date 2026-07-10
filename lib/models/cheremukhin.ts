@@ -127,10 +127,20 @@ export async function computeCheremukhin(
     const pop = observationsToMap(popObs)
 
     // Structural ratio: civilian noninstitutional 16+ share of total population.
+    // Carry-forward: POPTHM lags PAYEMS by ~1-2 months. When POPTHM is missing
+    // for a month where CNP16OV is available, reuse the last known POPTHM so
+    // the ratio stays current and doesn't drop out of the trailing window.
     const ratio = new Map<string, number>()
-    for (const [date, p] of pop) {
+    let lastKnownPop: number | null = null
+    const ratioDates = [...new Set([...pop.keys(), ...cnp.keys()])].sort()
+    for (const date of ratioDates) {
+      const p = pop.get(date)
+      if (p != null && p > 0) lastKnownPop = p
       const c = cnp.get(date)
-      if (c != null && p > 0) ratio.set(date, c / p)
+      const effectivePop = p ?? lastKnownPop
+      if (c != null && effectivePop != null && effectivePop > 0) {
+        ratio.set(date, c / effectivePop)
+      }
     }
 
     const deltaPopulation = NATURAL_CHANGE_PER_MONTH + scenario.monthlyNetImmigration
@@ -143,12 +153,15 @@ export async function computeCheremukhin(
     const points: BreakevenPoint[] = []
     const components: CheremukhinComponentPoint[] = []
     let latest: CheremukhinComponentPoint | null = null
+    let lastValidP: number | null = null
 
     for (const date of months) {
       if (date < displayStart) continue
 
       const E = payems.get(date)
-      const P = pop.get(date)
+      const rawP = pop.get(date)
+      if (rawP != null && rawP > 0) lastValidP = rawP
+      const P = rawP ?? lastValidP
       const nPrev = payems.get(shiftMonths(date, -1))
       const actualNfp = E != null && nPrev != null ? E - nPrev : null
 
