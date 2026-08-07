@@ -135,6 +135,9 @@ export default async function AiSummaryPage() {
   const consensusMin = validBaselines.length ? Math.min(...validBaselines) : null
   const consensusMax = validBaselines.length ? Math.max(...validBaselines) : null
   const consensusMid = mean(baselineBreakevens)
+  const trimmedMean = validBaselines.length > 2
+    ? mean([...validBaselines].sort((a, b) => a - b).slice(1, -1))
+    : consensusMid
 
   const latestNfp = cer?.latestActual ?? stl?.latestActual ?? null
   const actualSummary = cer?.actualSummary ?? stl?.actualSummary ?? null
@@ -242,7 +245,7 @@ export default async function AiSummaryPage() {
       </div>
 
       {/* Aggregate consensus */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <ModelCard
           label="Consensus range"
           value={
@@ -256,6 +259,11 @@ export default async function AiSummaryPage() {
           label="Consensus midpoint"
           value={formatK(consensusMid, false)}
           sub="Mean of 7 baseline estimates"
+        />
+        <ModelCard
+          label="Trimmed mean"
+          value={formatK(trimmedMean, false)}
+          sub="Mean excl. top & bottom estimate"
         />
         <ModelCard
           label="Latest actual NFP"
