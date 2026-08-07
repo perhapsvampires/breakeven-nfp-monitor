@@ -1,10 +1,10 @@
 {
   "meta": {
-    "generatedAt": "2026-06-10T17:23:16.652Z",
+    "generatedAt": "2026-08-07T14:21:00.755Z",
     "source": "U.S. Census Bureau, CPS Basic Monthly microdata",
     "weight": "PWSSWGT",
     "trendWindowMonths": 24,
-    "latestMonth": "2026-04-01",
+    "latestMonth": "2026-06-01",
     "monthsUsed": 24
   },
   "ageBands": [
@@ -20,101 +20,101 @@
       "id": "M-16-24",
       "sex": "M",
       "ageBand": "16-24",
-      "trendLFP": 0.5661,
-      "latestPop": 20131,
-      "latestLF": 10979.6
+      "trendLFP": 0.56848,
+      "latestPop": 20100,
+      "latestLF": 12287.5
     },
     {
       "id": "M-25-34",
       "sex": "M",
       "ageBand": "25-34",
-      "trendLFP": 0.89319,
-      "latestPop": 22639.4,
-      "latestLF": 20470.9
+      "trendLFP": 0.89342,
+      "latestPop": 22649.7,
+      "latestLF": 19952.4
     },
     {
       "id": "M-35-44",
       "sex": "M",
       "ageBand": "35-44",
-      "trendLFP": 0.90901,
-      "latestPop": 21976.2,
-      "latestLF": 19930.5
+      "trendLFP": 0.90893,
+      "latestPop": 22006,
+      "latestLF": 19873.2
     },
     {
       "id": "M-45-54",
       "sex": "M",
       "ageBand": "45-54",
-      "trendLFP": 0.88126,
-      "latestPop": 19290.5,
-      "latestLF": 17076.2
+      "trendLFP": 0.88166,
+      "latestPop": 19298,
+      "latestLF": 16990.6
     },
     {
       "id": "M-55-64",
       "sex": "M",
       "ageBand": "55-64",
-      "trendLFP": 0.72326,
-      "latestPop": 19483.5,
-      "latestLF": 14018.1
+      "trendLFP": 0.7232,
+      "latestPop": 19443.5,
+      "latestLF": 13827.4
     },
     {
       "id": "M-65+",
       "sex": "M",
       "ageBand": "65+",
-      "trendLFP": 0.23714,
-      "latestPop": 29149.6,
-      "latestLF": 6545.6
+      "trendLFP": 0.23638,
+      "latestPop": 29266.2,
+      "latestLF": 6662.7
     },
     {
       "id": "F-16-24",
       "sex": "F",
       "ageBand": "16-24",
-      "trendLFP": 0.55183,
-      "latestPop": 19610.4,
-      "latestLF": 10497.6
+      "trendLFP": 0.55198,
+      "latestPop": 19577.6,
+      "latestLF": 11252.2
     },
     {
       "id": "F-25-34",
       "sex": "F",
       "ageBand": "25-34",
-      "trendLFP": 0.78295,
-      "latestPop": 23009.7,
-      "latestLF": 17925.2
+      "trendLFP": 0.78214,
+      "latestPop": 23014.2,
+      "latestLF": 17534.1
     },
     {
       "id": "F-35-44",
       "sex": "F",
       "ageBand": "35-44",
-      "trendLFP": 0.78572,
-      "latestPop": 22821.3,
-      "latestLF": 17905.3
+      "trendLFP": 0.78557,
+      "latestPop": 22852.8,
+      "latestLF": 17982.2
     },
     {
       "id": "F-45-54",
       "sex": "F",
       "ageBand": "45-54",
-      "trendLFP": 0.77571,
-      "latestPop": 20353.3,
-      "latestLF": 15978.6
+      "trendLFP": 0.77538,
+      "latestPop": 20363,
+      "latestLF": 15678.6
     },
     {
       "id": "F-55-64",
       "sex": "F",
       "ageBand": "55-64",
-      "trendLFP": 0.6162,
-      "latestPop": 21070.9,
-      "latestLF": 13208.3
+      "trendLFP": 0.61651,
+      "latestPop": 21030.9,
+      "latestLF": 12833.7
     },
     {
       "id": "F-65+",
       "sex": "F",
       "ageBand": "65+",
-      "trendLFP": 0.16334,
-      "latestPop": 35418.7,
-      "latestLF": 5699.4
+      "trendLFP": 0.16313,
+      "latestPop": 35564.3,
+      "latestLF": 5860.4
     }
   ],
   "totals": {
-    "latestLF": 170235.2,
-    "latestPop": 274954.6
+    "latestLF": 170735,
+    "latestPop": 275166.2
   }
 }
