@@ -232,7 +232,7 @@ export default async function AiSummaryPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight text-primary">AI Summary</h2>
+          <h2 className="text-2xl font-semibold tracking-tight text-primary">Summary</h2>
           <p className="mt-1 text-sm text-secondary">
             Claude synthesizes seven breakeven methodologies into a consensus view.
             Analysis regenerates automatically after each BLS Employment Situation release.
@@ -242,7 +242,7 @@ export default async function AiSummaryPage() {
       </div>
 
       {/* Aggregate consensus */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <ModelCard
           label="Consensus range"
           value={
@@ -267,6 +267,11 @@ export default async function AiSummaryPage() {
             : latestNfp < consensusMin ? 'negative'
             : 'neutral'
           }
+        />
+        <ModelCard
+          label="3-month avg NFP"
+          value={formatK(actualSummary?.avg3 ?? null)}
+          sub="Recent trend"
         />
       </div>
 
