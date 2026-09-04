@@ -46,6 +46,7 @@ import { SERIES } from '@/config/series'
 import { summarize } from '@/lib/filters'
 import {
   getScenario,
+  NATURAL_CHANGE,
   type ImmigrationScenario,
   type ScenarioId,
 } from '@/config/scenarios.config'
@@ -60,8 +61,14 @@ export const PRE_PANDEMIC_RANGE = { low: 60, high: 100 }
 /** CBO's 2019-vintage projection of net immigration, thousands/year (~1.0M/year). */
 export const PRE_PANDEMIC_PROJECTION = 1000
 
-/** Assumed natural population change (births minus deaths), thousands/year — matches the Dallas Fed model's 30k/month. */
-export const NATURAL_CHANGE_ANNUAL = 360
+/**
+ * Assumed natural population change (births minus deaths), thousands/year.
+ * Derived from the single config constant rather than restated, so this and the
+ * Dallas Fed model cannot drift apart. See the caveat on NATURAL_CHANGE — the
+ * value is not source-verified, and it directly scales the net-immigration
+ * figure this model backs out of POPTHM.
+ */
+export const NATURAL_CHANGE_ANNUAL = NATURAL_CHANGE.value * 12
 
 function shiftMonths(date: string, delta: number): string {
   const [y, m] = date.split('-').map(Number)

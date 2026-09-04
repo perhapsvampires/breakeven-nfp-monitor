@@ -54,6 +54,28 @@ export const SCENARIOS: ImmigrationScenario[] = [
 
 export const DEFAULT_SCENARIO: ScenarioId = 'baseline'
 
+/**
+ * Natural population change (births minus deaths), thousands per month, all
+ * ages. Used by the Brookings model to back realized net immigration out of
+ * POPTHM, and by the Dallas Fed model as its forward/fallback population
+ * assumption. Previously hardcoded separately in both files.
+ *
+ * ⚠️ UNVERIFIED VALUE. 30k/month (360k/year) was inherited from the original
+ * implementation and has NOT been checked against a source. Recent Census
+ * components-of-change estimates put US natural increase materially higher
+ * (order 500k/year), which would mean the Brookings model over-attributes
+ * population growth to immigration by roughly 140k/year — about +7k/month on
+ * that model's breakeven. Verify against the current Census vintage
+ * (NST-EST components of change) and update `value` and `vintageDate`
+ * together. Do not change one without the other.
+ */
+export const NATURAL_CHANGE = {
+  /** Thousands per month. */
+  value: 30,
+  source: 'inherited from original implementation — NOT source-verified',
+  vintageDate: 'unknown',
+} as const
+
 export function getScenario(id: string | undefined): ImmigrationScenario {
   return SCENARIOS.find((s) => s.id === id) ?? SCENARIOS.find((s) => s.id === DEFAULT_SCENARIO)!
 }

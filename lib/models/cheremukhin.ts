@@ -37,6 +37,7 @@ import { SERIES } from '@/config/series'
 import { summarize } from '@/lib/filters'
 import {
   getScenario,
+  NATURAL_CHANGE,
   type ImmigrationScenario,
   type ScenarioId,
 } from '@/config/scenarios.config'
@@ -53,7 +54,8 @@ const CYCLE_WINDOW = 24 // months, for g_lfp and g_structural
 // across 2020 and produce a meaningless g_lfp.
 const DEFAULT_DISPLAY_START = '2023-01-01'
 const FETCH_START = '2020-06-01' // headroom for 24-month MA + 12-month POPTHM lookback
-const NATURAL_CHANGE_PER_MONTH = 30 // thousands/month (CDC births − deaths trend)
+/** Thousands/month. Single source of truth in config; see its caveat there. */
+const NATURAL_CHANGE_PER_MONTH = NATURAL_CHANGE.value
 const MIN_WINDOW_OBS = 10
 
 function shiftMonths(date: string, delta: number): string {
