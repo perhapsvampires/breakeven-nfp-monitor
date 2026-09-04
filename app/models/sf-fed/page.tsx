@@ -147,20 +147,25 @@ export default async function SfFedPage() {
           the civilian labor-force level: the <strong>long-run</strong> trend
           keeps movements at the 40-year+ horizon (~{formatK(latestLongRun, false)}
           /month here), and the <strong>short-run</strong> trend keeps movements
-          down to ~18-month horizons (cyclically elevated by the 2022–24
-          immigration surge). The labor force is projected forward 24 months under
-          baseline vs high-immigration scenarios (dashed).
+          down to a 6-month horizon, the paper&rsquo;s stated definition
+          (cyclically elevated by the 2022–24 immigration surge). The labor force
+          is projected forward 30 months under baseline vs high-immigration
+          scenarios (dashed).
         </p>
         <p>
-          CLF16OV&rsquo;s January CPS population-control level jumps are removed
-          before filtering (a +2.2M Jan-2025 step would otherwise spike the
-          short-run trend), and the 2020–21 COVID crash/rebound is interpolated
-          as an outlier so the band-pass doesn&rsquo;t ring off it (which had
-          produced a spurious early-2022 dip). Realized values run well below the July-2024 paper
-          because net immigration reversed after 2024, genuinely collapsing the
-          short-run rate — a useful sanity check, not an error. Long-run sits at
-          the upper edge of the paper&rsquo;s 70–90k (aggregate FRED data vs the
-          paper&rsquo;s CPS microdata by age/sex/race).
+          January CPS population-control steps are deliberately{' '}
+          <strong>not</strong> removed. BLS steps the level each January rather
+          than revising history, so in 2022–24 those steps largely were how the
+          immigration surge entered the data; stripping them suppresses the very
+          signal the short-run rate measures. The 2020–21 COVID crash/rebound is
+          still interpolated as an outlier so the filter doesn&rsquo;t ring off
+          it. Replicated against the paper&rsquo;s vintage, the long-run anchor
+          matches exactly (72k for 2024); the short-run runs below it (95k vs
+          ~145k in Q1-2024), most likely because we use aggregate CLF16OV where
+          the paper used re-weighted CPS microdata by age/sex/race. Realized
+          values run well below the July-2024 paper because net immigration
+          reversed after 2024, genuinely collapsing the short-run rate — a
+          useful sanity check, not an error.
         </p>
       </MethodologyNote>
     </div>

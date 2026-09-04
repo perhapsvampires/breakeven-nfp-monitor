@@ -131,9 +131,29 @@ function aggregate(rows) {
   return out
 }
 
+// Optional flags, both default to current behaviour:
+//   --end=YYYY-MM   build an as-of vintage: start probing from that month
+//                   instead of today. Used to reconstruct the trend-LFP window
+//                   a paper would have had at publication, so replication
+//                   checks are apples-to-apples.
+//   --out=<path>    write somewhere other than data/sf-lfp.json. Always pass
+//                   this with --end — a historical vintage must never
+//                   overwrite the production file the dashboard reads.
+const endArg = process.argv.find((a) => a.startsWith('--end='))
+const outArg = process.argv.find((a) => a.startsWith('--out='))
+const END_MONTH = endArg ? endArg.slice('--end='.length) : null
+if (END_MONTH && !/^\d{4}-\d{2}$/.test(END_MONTH)) {
+  throw new Error(`--end must be YYYY-MM, got "${END_MONTH}"`)
+}
+if (END_MONTH && !outArg) {
+  throw new Error('--end requires --out; refusing to overwrite data/sf-lfp.json with a historical vintage')
+}
+
 /** Determine the most recent available month, then collect 24 going backward. */
 async function collectMonths() {
-  const now = new Date()
+  const now = END_MONTH
+    ? new Date(Date.UTC(+END_MONTH.slice(0, 4), +END_MONTH.slice(5, 7) - 1, 1))
+    : new Date()
   // Start probing from current month and walk back; CPS latest is usually ~1-2
   // months stale. We gather months (most recent first) until we have 24.
   const months = []
@@ -223,13 +243,16 @@ async function main() {
       trendWindowMonths: TREND_WINDOW,
       latestMonth: latestKey,
       monthsUsed: months.length,
+      ...(END_MONTH ? { vintageAsOf: END_MONTH, note: 'historical vintage — not for production use' } : {}),
     },
     ageBands: AGE_BANDS.map((a) => a.band),
     groups: groupOut,
     totals: { latestLF: totLatestLF, latestPop: totLatestPop },
   }
 
-  const outPath = join(ROOT, 'data', 'sf-lfp.json')
+  const outPath = outArg
+    ? outArg.slice('--out='.length)
+    : join(ROOT, 'data', 'sf-lfp.json')
   mkdirSync(dirname(outPath), { recursive: true })
   writeFileSync(outPath, JSON.stringify(payload, null, 2))
   console.log(`\nWrote ${outPath}`)

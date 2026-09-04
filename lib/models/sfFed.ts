@@ -1,10 +1,15 @@
 // Model 5 — SF Fed breakeven (Petrosky-Nadeau & Stewart, FRBSF EL 2024-18).
 //
-// dNbe = (1 − ū) × dLFtrend, ū = 4.4% (U.S. reference unemployment rate)
-// Trend labor force extracted with a Christiano-Fitzgerald asymmetric
-// band-pass filter:
-//   Long-run:  passes 2–480 month cycles (≈ 40-year horizon)
-//   Short-run: passes 2–72 month cycles; captures multi-year immigration cycles
+// dNbe = (1 − ū) × dLFtrend, ū = 3.8% ("Our baseline calculations assume a
+// long-run unemployment rate of 3.8%" — paper, "Long- and short-run breakeven
+// employment growth").
+//
+// Trend labor force extracted with a Christiano-Fitzgerald asymmetric filter.
+// NOTE ON DIRECTION: cfLowPass RETAINS periods >= cutoff. A larger cutoff means
+// a SMOOTHER trend, not a wider passband.
+//   Long-run:  cutoff 480 months — "movements at the 40-year or longer horizon"
+//   Short-run: cutoff SHORT_CUTOFF — "movements as frequent as every six
+//              months". See the calibration note on SHORT_CUTOFF below.
 //
 // Both filters run on CLF16OV (history) spliced with a Census-based demographic
 // projection (forward), which stabilizes filter endpoint drift. The short-run
@@ -24,17 +29,51 @@
 // and the projection splices onto realized CLF16OV continuously. Extending the
 // series forward also stabilizes the two-sided filter's recent endpoint.
 //
-// Realized history = de-stepped, COVID-interpolated CLF16OV (≡ the CPS aggregate).
+// Realized history = COVID-interpolated CLF16OV (≡ the CPS aggregate), NOT
+// de-stepped. BLS introduces new population controls each January as a one-time
+// level step rather than revising history, and in 2022-24 those steps largely
+// WERE how the immigration surge entered the labor force data. The paper used
+// CPS microdata as published, which carries the same steps, so removing them is
+// a deviation from its method — and removing them suppresses exactly the signal
+// the short-run breakeven is meant to measure. Disabling de-stepping moves the
+// long-run anchor to the paper's 72k exactly and lifts Q1-2024 short-run from
+// 83k to 95k. lib/filters.ts still exports deStepJanuary but nothing in the app
+// calls it now; it is kept because this decision is reversible and
+// scripts/calibrate-sf-cutoff.mjs --destep documents the comparison.
 
 import { fetchFredSeries, observationsToMap } from '@/lib/fred'
-import { cfLowPass, deStepJanuary, summarize } from '@/lib/filters'
+import { cfLowPass, summarize } from '@/lib/filters'
 import { SERIES } from '@/config/series'
 import sfLfpData from '@/data/sf-lfp.json'
 import popProjData from '@/data/population-projections.json'
 import type { BreakevenPoint, ModelResult } from '@/types/economic'
 
-const U = 0.044
-const SHORT_CUTOFF = 72
+const U = 0.038
+/**
+ * Short-run CF low-pass cutoff, months. The paper defines the short-run trend
+ * as "movements as frequent as every six months", so 6 is the literal reading
+ * and is what we use.
+ *
+ * scripts/calibrate-sf-cutoff.mjs replicates the paper's vintage (sample
+ * truncated at 2024-04). In the production configuration it reproduces the
+ * LONG-run anchor exactly: 72k for 2024 vs the paper's ~72k.
+ *
+ * The SHORT-run anchor is NOT reproduced at any cutoff:
+ *   cutoff  6 -> 95k    12 -> 55k    18 -> 27k    72 -> 121k   (paper: ~145k)
+ * The relationship is non-monotonic, and 72 is nearest only by coincidence —
+ * it is not the paper's definition, so we do not adopt it. The level gap is
+ * driven upstream of the cutoff, not by it. Of the two suspected causes:
+ *   1. RESOLVED — de-stepping was removing the immigration signal. It is now
+ *      disabled for this model (see the header note), which took the long-run
+ *      anchor to the paper's 72k exactly and Q1-2024 short-run to 95k. The
+ *      table above predates that change; re-run the script for current values.
+ *   2. RULED OUT — trend-LFP vintage. An as-of-2024-04 rebuild reproduces the
+ *      numbers to four decimals; the projection normalises the level away.
+ * The residual gap (95k vs ~145k) most likely lies in the realized labor-force
+ * series itself: we use aggregate CLF16OV, the paper used re-weighted CPS
+ * microdata. Re-run scripts/calibrate-sf-cutoff.mjs before changing this value.
+ */
+const SHORT_CUTOFF = 6
 const LONG_CUTOFF = 480
 const DEFAULT_DISPLAY_START = '2022-01-01'
 const DISPLAY_PROJ_MONTHS = 30 // months of projection to display past the data
@@ -141,8 +180,7 @@ export async function computeSfFed(options: SfFedOptions = {}): Promise<ModelRes
 
     const dates = clf.map((o) => o.date)
     const lastRealized = dates[dates.length - 1]
-    const deStepped = deStepJanuary(clf).adjusted
-    const adjusted = interpolateCovid(dates, deStepped)
+    const adjusted = interpolateCovid(dates, clf.map((o) => o.value))
     const realizedLast = adjusted[adjusted.length - 1]
 
     // ---- Forward projection: Σ_g pop_g(scenario) × trendLFP_g, normalized so
