@@ -56,7 +56,6 @@ export default async function FedBoardPage({
   const scenarioDeltaPopulation16 = (result.meta?.scenarioDeltaPopulation16 as number | null) ?? null
   const latestPotentialLFPR = (result.meta?.latestPotentialLFPR as number | null) ?? null
   const latestNrou = (result.meta?.latestNrou as number | null) ?? null
-  const latestDeltaPotentialLFPR = (result.meta?.latestDeltaPotentialLFPR as number | null) ?? null
   const populationGrowthTerm = (result.meta?.populationGrowthTerm as number | null) ?? null
   const lfprTrendTerm = (result.meta?.lfprTrendTerm as number | null) ?? null
   const observedDate = (result.meta?.observedDate as string | null) ?? null

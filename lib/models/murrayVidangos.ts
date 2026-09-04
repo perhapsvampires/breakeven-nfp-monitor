@@ -251,15 +251,18 @@ export async function computeMurrayVidangos(
           NATURAL_CHANGE_CNP16_PER_MONTH + scenario.monthlyNetImmigration * scenario.cnipShare
       }
 
+      // Both terms are required. Substituting 0 for a missing input silently
+      // drops a component rather than reporting a gap, and because potential
+      // LFPR trends DOWN, dropping the trend term biases breakeven upward —
+      // the error is directional, not neutral. Skip the month instead.
+      if (potLFPR_prev == null || pop16Prev == null) continue
+
       // ΔPotentialLFPR (month-over-month change, percentage points)
-      const deltaPotLFPR_pp =
-        potLFPR_prev != null ? potLFPR - potLFPR_prev : 0
+      const deltaPotLFPR_pp = potLFPR - potLFPR_prev
 
       // Potential labor force growth decomposition (thousands/month)
-      const populationGrowthTerm =
-        pop16Prev != null ? deltaPop16 * (potLFPR / 100) : deltaPop16 * (potLFPR / 100)
-      const lfprTrendTerm =
-        pop16Prev != null ? (deltaPotLFPR_pp / 100) * pop16Prev : 0
+      const populationGrowthTerm = deltaPop16 * (potLFPR / 100)
+      const lfprTrendTerm = (deltaPotLFPR_pp / 100) * pop16Prev
 
       const deltaPotLF = populationGrowthTerm + lfprTrendTerm
       const breakeven = deltaPotLF * (1 - nrou / 100)
@@ -304,9 +307,6 @@ export async function computeMurrayVidangos(
     const latestComputedPoint = lastWithActual ?? lastPoint
     const latestPotLFPR_disp = latestComputedPoint
       ? lfprMap.get(latestComputedPoint.date)
-      : null
-    const latestNrou_disp = latestComputedPoint
-      ? nrouMap.get(latestComputedPoint.date)
       : null
     const latestObsPop16 = latestComputedPoint
       ? cnp16.get(shiftMonths(latestComputedPoint.date, -1))
