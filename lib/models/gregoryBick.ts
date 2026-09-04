@@ -7,17 +7,21 @@
 //                      year-keyed (thousands/month), from scenarios.config.ts
 //   CIVPART_12m_avg  = 12-month trailing average of FRED CIVPART
 //   UNRATE           = prior-month FRED UNRATE
-//   survey_adjustment = rolling 12-month average of PAYEMS / LNS16000000
-//                      (LNS16000000 = household employment adjusted to the
-//                       payroll-survey concept; sourced from the BLS API,
-//                       since FRED does not carry it)
+//   survey_adjustment = rolling 12-month average of PAYEMS / CE16OV
+//                      (CE16OV = total household-survey employment, BLS series
+//                       LNS12000000. The paper defines this as "the average
+//                       level of employment in the establishment survey
+//                       relative to that in the household survey" and quotes
+//                       0.979 for Feb 2025; PAYEMS/CE16OV reproduces that.
+//                       NOTE: do NOT use LNS16000000 here — that is household
+//                       employment already adjusted to the payroll concept, and
+//                       the resulting ratio is >1, inflating breakeven ~3.5%.)
 //
 // Gregory & Bick use a single CBO projection, not immigration scenarios, so
 // there is no scenario toggle. The CBO values update when CBO publishes a new
 // Demographic Outlook (edit config/scenarios.config.ts).
 
 import { fetchFredSeries, observationsToMap } from '@/lib/fred'
-import { fetchBlsSeries } from '@/lib/bls'
 import { SERIES } from '@/config/series'
 import { summarize } from '@/lib/filters'
 import { CBO_POP_GROWTH, cboPopGrowthForYear } from '@/config/scenarios.config'
@@ -26,7 +30,6 @@ import type { BreakevenPoint, ModelResult } from '@/types/economic'
 const WINDOW = 12
 const DEFAULT_DISPLAY_START = '2024-01-01' // CBO config covers 2024+
 const FETCH_START = '2022-01-01' // headroom for 12-month trailing windows
-const BLS_START_YEAR = 2022
 
 function shiftMonths(date: string, delta: number): string {
   const [y, m] = date.split('-').map(Number)
@@ -77,24 +80,23 @@ export async function computeGregoryBick(
 ): Promise<ModelResult> {
   try {
     const displayStart = options.displayStart ?? DEFAULT_DISPLAY_START
-    const endYear = new Date().getFullYear()
 
-  const [payemsObs, civpartObs, unrateObs, lns16Obs] = await Promise.all([
+  const [payemsObs, civpartObs, unrateObs, ce16Obs] = await Promise.all([
     fetchFredSeries(SERIES.PAYEMS, { startDate: FETCH_START }),
     fetchFredSeries(SERIES.CIVPART, { startDate: FETCH_START }),
     fetchFredSeries(SERIES.UNRATE, { startDate: FETCH_START }),
-    fetchBlsSeries('LNS16000000', BLS_START_YEAR, endYear),
+    fetchFredSeries(SERIES.CE16OV, { startDate: FETCH_START }),
   ])
 
   const payems = observationsToMap(payemsObs)
   const civpart = observationsToMap(civpartObs)
   const unrate = observationsToMap(unrateObs)
-  const lns16 = observationsToMap(lns16Obs)
+  const ce16 = observationsToMap(ce16Obs)
 
-  // Per-month survey adjustment ratio PAYEMS / LNS16000000.
+  // Per-month survey adjustment ratio PAYEMS / CE16OV (establishment ÷ household).
   const surveyRatio = new Map<string, number>()
   for (const [date, n] of payems) {
-    const h = lns16.get(date)
+    const h = ce16.get(date)
     if (h != null && h > 0) surveyRatio.set(date, n / h)
   }
 
