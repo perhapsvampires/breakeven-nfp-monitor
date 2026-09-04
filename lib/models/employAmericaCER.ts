@@ -10,20 +10,32 @@
 //   g_e~  = ln( Σ_i E_it·(e_it'/e_it) / Σ_i E_it )    (within-cohort EPR change)
 //   g_CER = g_N - g_e~ - g_A   (population-driven breakeven)
 //
-// Cohorts i = {native, foreign-born} × age band (16-24, 25-34, 35-44, 45-54,
-// 55-64, 65+). E_it (employment) and P_it (population, for e_it = E_it/P_it)
+// Cohorts i = {native, foreign-born} × 5-year age band (16-19, 20-24, ...,
+// 65-69, 70+) = 24 cohorts, matching the paper's granularity except that its
+// 70-74 and 75+ are collapsed into 70+ to keep the foreign-born cells stable.
+// E_it (employment) and P_it (population, for e_it = E_it/P_it)
 // come from Census CPS Basic Monthly microdata, precomputed offline into
 // data/cer-cohorts.json by scripts/build-cer-cohorts.mjs. PAYEMS (g_N) is
 // fetched live from FRED. The foreign-born dimension is essential: it lets the
 // 2025-26 immigration reversal show up as a population effect (breakeven falls)
 // rather than being misattributed to within-cohort EPR changes.
 //
-// g_A (BLS payroll-concept adjustment) is small and slow-moving and is omitted
-// (set to 0); not available from FRED/CPS without the BLS research series.
+// g_A is the paper's CPS-to-CES definition adjustment:
+//
+//   A_t   = LNS16000000 / LNS12000000   (CPS employment adjusted to the CES
+//                                        concept, over total CPS employment)
+//   g_A   = ln( A_t' / A_t )
+//
+// It is NOT small: over 2025 the 12-month change ran +0.002 to +0.006, which is
+// a 30-84k/month effect on the breakeven, and it changes sign month to month.
+// LNS16000000 comes from the BLS API (lib/bls.ts); LNS12000000 is CE16OV on
+// FRED. If the BLS call fails, g_A degrades to 0 and `gAdjAvailable` is set
+// false so the UI can say so rather than silently overstating breakeven.
 //
 // Monthly breakeven (thousands/month) = g_CER · N_t' / 12.
 
 import { fetchFredSeries, observationsToMap } from '@/lib/fred'
+import { fetchBlsSeries } from '@/lib/bls'
 import { SERIES } from '@/config/series'
 import { summarize } from '@/lib/filters'
 import cohortData from '@/data/cer-cohorts.json'
@@ -36,6 +48,7 @@ import type {
 const WINDOW = 12 // months
 const DEFAULT_DISPLAY_START = '2020-01-01'
 const FETCH_START = '2018-01-01'
+const BLS_START_YEAR = 2018
 
 interface CohortCell {
   emp: number
@@ -120,8 +133,39 @@ export async function computeEmployAmericaCER(
   try {
     const displayStart = options.displayStart ?? DEFAULT_DISPLAY_START
 
-  const payemsObs = await fetchFredSeries(SERIES.PAYEMS, { startDate: FETCH_START })
+  // LNS16000000 is only on the BLS API. A BLS outage or quota trip must not
+  // blank the whole model — degrade g_A to 0 and flag it instead.
+  const [payemsObs, ce16Obs, lns16Obs] = await Promise.all([
+    fetchFredSeries(SERIES.PAYEMS, { startDate: FETCH_START }),
+    fetchFredSeries(SERIES.CE16OV, { startDate: FETCH_START }),
+    fetchBlsSeries('LNS16000000', BLS_START_YEAR, new Date().getFullYear()).catch(
+      (err) => {
+        console.error('CER: BLS LNS16000000 unavailable, g_A degraded to 0:', err)
+        return null
+      },
+    ),
+  ])
   const payems = observationsToMap(payemsObs)
+  const ce16 = observationsToMap(ce16Obs)
+  const lns16 = lns16Obs ? observationsToMap(lns16Obs) : null
+
+  // A_t = LNS16000000 / LNS12000000 (= CE16OV).
+  const adjLevel = new Map<string, number>()
+  if (lns16) {
+    for (const [date, adj] of lns16) {
+      const total = ce16.get(date)
+      if (total != null && total > 0 && adj > 0) adjLevel.set(date, adj / total)
+    }
+  }
+  const gAdjAvailable = adjLevel.size > 0
+
+  /** g_A = ln(A_t' / A_t) over the window, or null if either endpoint is missing. */
+  function adjChange(current: string, base: string): number | null {
+    const cur = adjLevel.get(current)
+    const bas = adjLevel.get(base)
+    if (cur == null || bas == null || cur <= 0 || bas <= 0) return null
+    return Math.log(cur / bas)
+  }
 
   const months = payemsObs
     .filter((o) => o.value != null)
@@ -134,6 +178,9 @@ export async function computeEmployAmericaCER(
   // eprChange returns null. We reuse the last known value so that new PAYEMS
   // prints still produce a breakeven estimate rather than a gap in the chart.
   let lastValidGEpr: number | null = null
+  // BLS publishes LNS16000000 on its own schedule and has gaps (e.g. Oct 2025),
+  // so g_A gets the same carry-forward treatment as g_e~.
+  let lastValidGAdj: number | null = null
 
   for (const date of months) {
     const base = shiftMonths(date, -WINDOW)
@@ -141,11 +188,14 @@ export async function computeEmployAmericaCER(
     const nCur = payems.get(date)
     const nBase = payems.get(base)
 
-    // Always compute gEpr (even pre-displayStart) to keep the carry-forward current.
+    // Always compute gEpr/gAdj (even pre-displayStart) to keep carry-forward current.
     let gEpr: number | null = null
+    let gAdj: number | null = null
     if (nCur != null && nBase != null && nBase > 0) {
       gEpr = eprChange(date, base)
       if (gEpr != null) lastValidGEpr = gEpr
+      gAdj = adjChange(date, base)
+      if (gAdj != null) lastValidGAdj = gAdj
     }
 
     if (date < displayStart) continue
@@ -157,14 +207,17 @@ export async function computeEmployAmericaCER(
     let breakeven: number | null = null
     if (nCur != null && nBase != null && nBase > 0) {
       const effectiveGEpr = gEpr ?? lastValidGEpr
+      // Degrades to 0 only when BLS is unavailable; gAdjAvailable records which.
+      const effectiveGAdj = gAdj ?? lastValidGAdj ?? 0
       if (effectiveGEpr != null) {
         const gN = Math.log(nCur / nBase)
-        const gCer = gN - effectiveGEpr
+        const gCer = gN - effectiveGEpr - effectiveGAdj
         breakeven = (gCer * nCur) / WINDOW
         latestDecomp = {
           gN: (gN * nCur) / WINDOW,
           gEpr: (effectiveGEpr * nCur) / WINDOW,
-          gAdj: 0,
+          gAdj: (effectiveGAdj * nCur) / WINDOW,
+          gAdjAvailable,
           gCer: breakeven,
         }
       }
@@ -194,6 +247,7 @@ export async function computeEmployAmericaCER(
       meta: {
         decomposition: latestDecomp,
         cohortSource: data.meta,
+        gAdjAvailable,
       },
     }
   } catch (err) {

@@ -59,8 +59,10 @@ export interface CerDecomposition {
   gN: number
   /** Within-cohort EPR change contribution (subtracted). */
   gEpr: number
-  /** CPS->CES adjustment contribution (subtracted; 0 in FRED-only build). */
+  /** CPS->CES adjustment contribution (subtracted). */
   gAdj: number
+  /** False when the BLS series was unreachable and gAdj fell back to 0. */
+  gAdjAvailable: boolean
   /** Resulting CER breakeven. */
   gCer: number
 }

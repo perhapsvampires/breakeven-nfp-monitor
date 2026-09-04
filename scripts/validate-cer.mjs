@@ -10,7 +10,13 @@ import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const FRED_KEY = readFileSync(join(ROOT, 'fred_api_key.txt'), 'utf8').trim()
-const data = JSON.parse(readFileSync(join(ROOT, 'data', 'cer-cohorts.json'), 'utf8'))
+// Optional --cohorts=<path> lets you validate an alternative cohort file (e.g.
+// a pre-rebuild backup) against the same chart readings, for A/B comparison.
+const cohortsArg = process.argv.find((a) => a.startsWith('--cohorts='))
+const COHORTS_PATH = cohortsArg
+  ? cohortsArg.slice('--cohorts='.length)
+  : join(ROOT, 'data', 'cer-cohorts.json')
+const data = JSON.parse(readFileSync(COHORTS_PATH, 'utf8'))
 
 const COHORT_IDS = data.cohorts.map((c) => c.id)
 
@@ -20,13 +26,15 @@ function shiftMonths(date, delta) {
   return `${Math.floor(idx / 12)}-${String((idx % 12) + 1).padStart(2, '0')}-01`
 }
 
-async function fetchPayems() {
-  const url = `https://api.stlouisfed.org/fred/series/observations?series_id=PAYEMS&api_key=${FRED_KEY}&file_type=json&observation_start=2016-01-01`
+async function fetchFred(seriesId) {
+  const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${FRED_KEY}&file_type=json&observation_start=2016-01-01`
   const j = await (await fetch(url)).json()
   const m = new Map()
   for (const o of j.observations) if (o.value !== '.') m.set(o.date, parseFloat(o.value))
   return m
 }
+
+const fetchPayems = () => fetchFred('PAYEMS')
 
 function eprChange(current, base) {
   const cur = data.months[current]
@@ -56,9 +64,40 @@ const CHART = {
   '2026-02': 20, '2026-03': 35, '2026-04': 50,
 }
 
+// g_A = ln(A_t'/A_t), A = LNS16000000 (BLS) / CE16OV (FRED) — the paper's
+// CPS->CES definition adjustment. Must be included here or this script cannot
+// validate what lib/models/employAmericaCER.ts actually computes.
+async function fetchAdjustment() {
+  const startYear = 2016
+  const endYear = new Date().getFullYear()
+  const blsUrl =
+    `https://api.bls.gov/publicAPI/v2/timeseries/data/LNS16000000` +
+    `?startyear=${startYear}&endyear=${endYear}`
+  const bls = await (await fetch(blsUrl)).json()
+  if (bls.status !== 'REQUEST_SUCCEEDED') {
+    console.warn(`  WARNING: BLS unavailable (${JSON.stringify(bls.message)}); g_A treated as 0`)
+    return null
+  }
+  const adj = new Map()
+  for (const row of bls.Results?.series?.[0]?.data ?? []) {
+    if (!/^M(0[1-9]|1[0-2])$/.test(row.period)) continue
+    if (row.value === '-' || row.value === '') continue
+    adj.set(`${row.year}-${row.period.slice(1)}-01`, parseFloat(row.value))
+  }
+  const ce = await fetchFred('CE16OV')
+  const out = new Map()
+  for (const [d, v] of adj) {
+    const t = ce.get(d)
+    if (t != null && t > 0 && v > 0) out.set(d, v / t)
+  }
+  return out
+}
+
 const payems = await fetchPayems()
-console.log('month   | mine | chart | diff')
-let n = 0, sae = 0, sMine = 0, sChart = 0
+const adjLevel = await fetchAdjustment()
+
+console.log('month   | mine | chart | diff |   g_A')
+let n = 0, sae = 0, sMine = 0, sChart = 0, nAdj = 0
 for (const ym of Object.keys(CHART)) {
   const d = `${ym}-01`
   const base = shiftMonths(d, -12)
@@ -68,9 +107,22 @@ for (const ym of Object.keys(CHART)) {
   const gEpr = eprChange(d, base)
   if (gEpr == null) { console.log(`${ym} | (no cohort data for ${d} or ${base})`); continue }
   const gN = Math.log(nc / nb)
-  const brk = Math.round(((gN - gEpr) * nc) / 12)
+  const aCur = adjLevel?.get(d)
+  const aBase = adjLevel?.get(base)
+  const gAdj = aCur != null && aBase != null ? Math.log(aCur / aBase) : 0
+  if (gAdj !== 0) nAdj++
+  const brk = Math.round(((gN - gEpr - gAdj) * nc) / 12)
   const ch = CHART[ym]
-  console.log(`${ym} | ${String(brk).padStart(4)} | ${String(ch).padStart(5)} | ${String(brk - ch).padStart(5)}`)
+  const gAdjK = Math.round((gAdj * nc) / 12)
+  console.log(
+    `${ym} | ${String(brk).padStart(4)} | ${String(ch).padStart(5)} | ${String(brk - ch).padStart(4)} | ${String(gAdjK).padStart(5)}`,
+  )
   n++; sae += Math.abs(brk - ch); sMine += brk; sChart += ch
 }
-console.log(`\nN=${n}  mean(mine)=${(sMine / n).toFixed(0)}  mean(chart)=${(sChart / n).toFixed(0)}  MAE=${(sae / n).toFixed(0)}k`)
+const bias = (sMine - sChart) / n
+console.log(
+  `\nN=${n} (g_A on ${nAdj})  mean(mine)=${(sMine / n).toFixed(0)}  ` +
+  `mean(chart)=${(sChart / n).toFixed(0)}  bias=${bias > 0 ? '+' : ''}${bias.toFixed(0)}k  ` +
+  `MAE=${(sae / n).toFixed(0)}k`,
+)
+console.log(`cohorts: ${COHORT_IDS.length}  (${data.meta.firstMonth} -> ${data.meta.lastMonth})`)

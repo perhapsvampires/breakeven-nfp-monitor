@@ -127,7 +127,13 @@ export default async function EmployAmericaPage() {
             <span className="font-medium text-primary">{formatK(decomp.gEpr)}</span>
             <span className="text-tertiary">−</span>
             <span className="text-secondary">adjustment</span>
-            <span className="font-medium text-primary">{formatK(decomp.gAdj)}</span>
+            {decomp.gAdjAvailable ? (
+              <span className="font-medium text-primary">{formatK(decomp.gAdj)}</span>
+            ) : (
+              <span className="font-medium text-warning" title="BLS series LNS16000000 unavailable; breakeven is overstated by this term">
+                n/a
+              </span>
+            )}
             <span className="text-tertiary">=</span>
             <span className="text-secondary">CER breakeven</span>
             <span className="font-semibold text-accent">{formatK(decomp.gCer, false)}</span>
@@ -161,14 +167,20 @@ export default async function EmployAmericaPage() {
           employment rates constant.
         </p>
         <p>
-          Cohorts are defined by foreign-born status crossed with age band
-          (16-24, 25-34, 35-44, 45-54, 55-64, 65+), with employment and
-          population aggregated from Census CPS Basic Monthly microdata
+          Cohorts are defined by foreign-born status crossed with 5-year age
+          bands (16-19, 20-24, …, 65-69, 70+) — the paper&rsquo;s granularity,
+          except that its 70-74 and 75+ are collapsed into 70+ to keep the
+          foreign-born cells large enough for a stable monthly EPR. Employment
+          and population are aggregated from Census CPS Basic Monthly microdata
           (weight PWSSWGT). The foreign-born dimension lets the 2025-26
           immigration reversal register as a population effect — the reason this
-          tracks Employ America&rsquo;s published series. The small payroll-concept
-          adjustment g_A is set to 0. Validated against the published chart:
-          mean ≈ 123k vs 99k, MAE ≈ 40k, capturing the 2024→2026 decline.
+          tracks Employ America&rsquo;s published series. The payroll-concept
+          adjustment g_A = ln(A_t′/A_t), A = LNS16000000/CE16OV, is included;
+          it is not small, running a 30-80k/month effect through 2025.
+          Validated against the published chart over 27 months: mean 86k vs
+          99k (bias −13k), MAE 40k. January estimates are the least reliable —
+          the annual CPS population-control revision steps the cohort
+          employment levels that weight the EPR term.
         </p>
       </MethodologyNote>
     </div>
