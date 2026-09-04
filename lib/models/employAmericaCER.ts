@@ -205,6 +205,10 @@ export async function computeEmployAmericaCER(
     const actualNfp = nCur != null && nPrev != null ? nCur - nPrev : null
 
     let breakeven: number | null = null
+    // A month is stale if either input had to be carried forward. gAdj is only
+    // counted when BLS data exists at all — when it is unavailable the whole
+    // series is flagged via gAdjAvailable instead.
+    const stale = gEpr == null || (gAdjAvailable && gAdj == null)
     if (nCur != null && nBase != null && nBase > 0) {
       const effectiveGEpr = gEpr ?? lastValidGEpr
       // Degrades to 0 only when BLS is unavailable; gAdjAvailable records which.
@@ -228,7 +232,16 @@ export async function computeEmployAmericaCER(
       actualNfp,
       breakeven,
       gap: actualNfp != null && breakeven != null ? actualNfp - breakeven : null,
+      ...(breakeven != null && stale ? { stale: true } : {}),
     })
+  }
+
+  // Trailing run of carried-forward months — what the UI needs to disclose.
+  let staleMonths = 0
+  for (let i = points.length - 1; i >= 0; i--) {
+    if (points[i].breakeven == null) continue
+    if (points[i].stale) staleMonths++
+    else break
   }
 
   const actualSeries = points.map((p) => p.actualNfp)
@@ -248,6 +261,10 @@ export async function computeEmployAmericaCER(
         decomposition: latestDecomp,
         cohortSource: data.meta,
         gAdjAvailable,
+        /** Cohort microdata vintage — the EPR term cannot be fresher than this. */
+        cohortLastMonth: (data.meta as { lastMonth?: string } | undefined)?.lastMonth ?? null,
+        /** Trailing months whose breakeven uses a carried-forward input. */
+        staleMonths,
       },
     }
   } catch (err) {

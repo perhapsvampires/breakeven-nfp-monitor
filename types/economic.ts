@@ -18,6 +18,13 @@ export interface BreakevenPoint {
   actualNfp: number | null // month-over-month NFP change, thousands
   breakeven: number | null // model breakeven, thousands/month
   gap: number | null // actualNfp - breakeven
+  /**
+   * True when the breakeven relies on an input carried forward from an earlier
+   * month rather than one observed for this month — e.g. the CER model reusing
+   * the last known cohort EPR term while CPS microdata lags PAYEMS. The value
+   * is still the model's best estimate, but it is not a fresh observation.
+   */
+  stale?: boolean
 }
 
 /** Latest / trailing-average summary for a series, in thousands/month. */

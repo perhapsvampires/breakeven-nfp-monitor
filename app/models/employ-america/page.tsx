@@ -54,9 +54,24 @@ export default async function EmployAmericaPage() {
       ? result.latestActual - result.latestBreakeven
       : null
   const decomp = (result.meta?.decomposition as CerDecomposition | null) ?? null
+  const staleMonths = (result.meta?.staleMonths as number | undefined) ?? 0
+  const cohortLastMonth = (result.meta?.cohortLastMonth as string | null) ?? null
 
   return (
     <div className="space-y-6">
+      {staleMonths > 0 && (
+        <div className="rounded-lg border border-border bg-surface px-4 py-3 text-sm text-secondary">
+          <span className="font-medium text-warning">
+            {staleMonths === 1 ? 'Latest month' : `Latest ${staleMonths} months`}
+          </span>{' '}
+          use a carried-forward cohort EPR term
+          {cohortLastMonth
+            ? `: CPS microdata runs through ${formatMonthYear(cohortLastMonth)}, behind the payroll data.`
+            : ' — CPS microdata is behind the payroll data.'}{' '}
+          Payroll growth is current; the employment-rate component is not, so
+          these points will revise when the next CPS release lands.
+        </div>
+      )}
       {/* Title */}
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
