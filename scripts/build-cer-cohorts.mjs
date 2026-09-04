@@ -39,16 +39,30 @@ const MIN_RECORDS = 60000
 const MIN_EMP = 125_000_000
 const MAX_EMP = 175_000_000
 
-// Age bands partition the 16+ population. (Employ America crosses these with
-// foreign-born status; their caption omits 45-54, almost certainly a typo, so
-// we keep a complete partition.)
+// Age bands partition the 16+ population, crossed with nativity -> 24 cohorts.
+//
+// The paper specifies 5-year bands "16-19, 20-24, ..., 70-74, 75+". Coarser
+// bands let within-band composition shifts (aging) masquerade as EPR changes,
+// and since CER breakeven is the residual, that error lands directly in the
+// headline. We therefore use the paper's granularity, with one deviation:
+// 70-74 and 75+ are collapsed into 70+, because splitting them leaves the
+// foreign-born cells too thin to give a stable monthly EPR.
+//
+// (Employ America's own caption omits 45-54, almost certainly a typo; we keep
+// a complete partition.)
 const AGE_BANDS = [
-  { band: '16-24', min: 16, max: 24 },
-  { band: '25-34', min: 25, max: 34 },
-  { band: '35-44', min: 35, max: 44 },
-  { band: '45-54', min: 45, max: 54 },
-  { band: '55-64', min: 55, max: 64 },
-  { band: '65+', min: 65, max: 200 },
+  { band: '16-19', min: 16, max: 19 },
+  { band: '20-24', min: 20, max: 24 },
+  { band: '25-29', min: 25, max: 29 },
+  { band: '30-34', min: 30, max: 34 },
+  { band: '35-39', min: 35, max: 39 },
+  { band: '40-44', min: 40, max: 44 },
+  { band: '45-49', min: 45, max: 49 },
+  { band: '50-54', min: 50, max: 54 },
+  { band: '55-59', min: 55, max: 59 },
+  { band: '60-64', min: 60, max: 64 },
+  { band: '65-69', min: 65, max: 69 },
+  { band: '70+', min: 70, max: 200 },
 ]
 
 const COHORTS = []
