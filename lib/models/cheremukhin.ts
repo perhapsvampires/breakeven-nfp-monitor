@@ -9,7 +9,15 @@
 //   breakeven = (g_pop + g_lfp + g_structural) × EmploymentLevel
 //
 //   g_pop        = ΔPopulation / POPTHM, where ΔPopulation (thousands/month)
-//                  = natural change (≈30k) + scenario net immigration
+//                  = (POPTHM_t − POPTHM_{t-12}) / 12, i.e. REALIZED population
+//                  growth, smoothed over 12 months to avoid the annual Census
+//                  vintage step. The paper's central finding is that this
+//                  component moved (≈150k contribution at the 2023 peak, ≈50k
+//                  by mid-2025 — about half the total decline in breakeven), so
+//                  it must vary by month; a constant cannot reproduce it.
+//                  The scenario value (natural change + net immigration) is used
+//                  only as the fallback for trailing months where POPTHM lags
+//                  PAYEMS, and as the forward-looking assumption.
 //   g_lfp        = 2-year (24-month) moving average of monthly CIVPART growth
 //   g_structural = trailing average of monthly growth in the CNP16OV/POPTHM ratio
 //
@@ -39,8 +47,12 @@ import type {
 } from '@/types/economic'
 
 const CYCLE_WINDOW = 24 // months, for g_lfp and g_structural
-const DEFAULT_DISPLAY_START = '2024-01-01' // avoids COVID distortion in the 2yr MA
-const FETCH_START = '2021-06-01' // headroom for 24-month trailing windows
+// 2023 start shows the paper's ~250k mid-2023 peak and the collapse that
+// follows. It is also the earliest start whose 24-month MA window (2021-02
+// onward) excludes the COVID trough entirely — a 2022 start would average
+// across 2020 and produce a meaningless g_lfp.
+const DEFAULT_DISPLAY_START = '2023-01-01'
+const FETCH_START = '2020-06-01' // headroom for 24-month MA + 12-month POPTHM lookback
 const NATURAL_CHANGE_PER_MONTH = 30 // thousands/month (CDC births − deaths trend)
 const MIN_WINDOW_OBS = 10
 
@@ -143,7 +155,10 @@ export async function computeCheremukhin(
       }
     }
 
-    const deltaPopulation = NATURAL_CHANGE_PER_MONTH + scenario.monthlyNetImmigration
+    // Forward/fallback assumption only — see the header note. Realized months
+    // use POPTHM directly.
+    const scenarioDeltaPopulation =
+      NATURAL_CHANGE_PER_MONTH + scenario.monthlyNetImmigration
 
     const months = payemsObs
       .filter((o) => o.value != null)
@@ -154,6 +169,8 @@ export async function computeCheremukhin(
     const components: CheremukhinComponentPoint[] = []
     let latest: CheremukhinComponentPoint | null = null
     let lastValidP: number | null = null
+    let latestDeltaPopulation: number | null = null
+    let latestDeltaPopulationObserved = false
 
     for (const date of months) {
       if (date < displayStart) continue
@@ -170,6 +187,15 @@ export async function computeCheremukhin(
       let structC: number | null = null
       let breakeven: number | null = null
 
+      // Realized monthly population change from POPTHM over 12 months; falls
+      // back to the scenario assumption only where POPTHM lags PAYEMS.
+      const popPrev12 = pop.get(shiftMonths(date, -12))
+      const deltaPopulation =
+        rawP != null && popPrev12 != null
+          ? (rawP - popPrev12) / 12
+          : scenarioDeltaPopulation
+      const deltaPopulationObserved = rawP != null && popPrev12 != null
+
       if (E != null && P != null && P > 0) {
         const gLfp = deJumpedRate(civpart, date, CYCLE_WINDOW)
         const gStruct = deJumpedRate(ratio, date, CYCLE_WINDOW)
@@ -178,6 +204,8 @@ export async function computeCheremukhin(
           lfpC = gLfp * E
           structC = gStruct * E
           breakeven = popC + lfpC + structC
+          latestDeltaPopulation = deltaPopulation
+          latestDeltaPopulationObserved = deltaPopulationObserved
         }
       }
 
@@ -213,7 +241,10 @@ export async function computeCheremukhin(
         scenario,
         components,
         decomposition: latest,
-        deltaPopulation,
+        /** Realized (or scenario-fallback) population change at the latest point. */
+        deltaPopulation: latestDeltaPopulation,
+        deltaPopulationObserved: latestDeltaPopulationObserved,
+        scenarioDeltaPopulation,
         naturalChange: NATURAL_CHANGE_PER_MONTH,
       },
     }
