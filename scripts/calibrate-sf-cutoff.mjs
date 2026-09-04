@@ -3,6 +3,12 @@
 //
 //   node scripts/calibrate-sf-cutoff.mjs
 //
+// Supersedes the former scripts/validate-sf.mjs, which was written before the
+// model and never updated: it de-stepped, swept cutoffs [12,18], and projected
+// with a terminal-growth ramp rather than the Census NPP x trend-LFP method the
+// model actually uses. Recover it with `git show 90fd5f6:scripts/validate-sf.mjs`
+// if ever needed.
+//
 // The paper's stated definition is "movements as frequent as every six months"
 // -> cutoff 6. This script checks what each candidate cutoff actually produces.
 //

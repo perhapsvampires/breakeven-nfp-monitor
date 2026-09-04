@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/maybe-rebuild-cohorts.mjs",
+    "prebuild": "node scripts/maybe-rebuild-microdata.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

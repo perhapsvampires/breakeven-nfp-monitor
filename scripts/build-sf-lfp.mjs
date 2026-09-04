@@ -16,13 +16,23 @@
 //
 // Validation: the latest-month total labor force reconciles with FRED CLF16OV.
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const KEY = readFileSync(join(ROOT, 'census_api_key.txt'), 'utf8').trim()
-const FRED_KEY = readFileSync(join(ROOT, 'fred_api_key.txt'), 'utf8').trim()
+
+// Env var first, local key file second. The key files are gitignored, so on a
+// build host (Vercel) only the env var exists — reading the file unconditionally
+// crashed there. Mirrors getCensusKey() in build-cer-cohorts.mjs.
+function getKey(envVar, fileName) {
+  if (process.env[envVar]) return process.env[envVar]
+  const p = join(ROOT, fileName)
+  if (existsSync(p)) return readFileSync(p, 'utf8').trim()
+  throw new Error(`${envVar} not found: set the env var or create ${fileName}`)
+}
+const KEY = getKey('CENSUS_API_KEY', 'census_api_key.txt')
+const FRED_KEY = getKey('FRED_API_KEY', 'fred_api_key.txt')
 
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
 const CONCURRENCY = 3
